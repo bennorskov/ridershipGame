@@ -1,13 +1,13 @@
 .displayCard {
   width: 70vw;
-  margin: 20vh auto;
+  margin: 18vh auto;
   background: black;
   color: white;
   padding: 2em; }
   .displayCard__title {
-    font-size: 5em; }
+    font-size: 2em; }
   .displayCard__lines {
-    font-size: 3em; }
+    font-size: 1.3em; }
     .displayCard__lines--circle {
       width: 1.7em;
       height: 1.7em;

@@ -1,3 +1,4 @@
+
 var gameModule = (function () {
 	var currentStation = null;
 	var dataSet = {
@@ -103,7 +104,19 @@ var gameModule = (function () {
 		},
 		addLines: function() {},
 		lockBottomScroll: function (buttonToLock) {},
-		checkSwipeAgainstSelected: function () {}
+		checkSwipeAgainstSelected: function () {},
+		init: function () {
+			var displayCardToTest = document.getElementByClassName("displayCard");
+			Transform(displayCardToTest);
+			new AlloyFinger(displayCardToTest, {
+			    pressMove:function(evt){
+			        displayCardToTest.translateX += evt.deltaX;
+			        displayCardToTest.translateY += evt.deltaY;
+			        evt.preventDefault();
+			        console.log(evt.deltaX);
+			    }
+			});
+		}
 	}
 })();
 

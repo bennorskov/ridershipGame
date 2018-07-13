@@ -24,7 +24,7 @@ $stationMargin: $stationWidth/2 + 1
 		@at-root #{&}--label
 			left: -2vw
 			top: -$stationWidth - 4
-			font-size: 2em
+			font-size: .75em
 			overflow: hidden
 			white-space: nowrap
 			text-overflow: ellipsis
@@ -45,7 +45,7 @@ $stationMargin: $stationWidth/2 + 1
 			.stationOrder__station--label
 				display: none
 			.stationOrder__station--lineLabel
-				font-size: 8em
+				font-size: 3em
 				top: $stationWidth * .25
 		@at-root #{&}--lineLabel
 			width: inherit
@@ -54,11 +54,11 @@ $stationMargin: $stationWidth/2 + 1
 			//background: pink
 			color: inherit
 			text-align: center
-			font-size: 6em
+			font-size: 2em
 			line-height: $stationWidth
 			position: absolute
 	@at-root #{&}__selectedStationLabel
-		font-size: 4em
+		font-size: 2em
 		position: fixed
 		bottom: 5vh
 		margin: auto

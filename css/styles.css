@@ -11,14 +11,14 @@ body {
 
 .displayCard {
   width: 70vw;
-  margin: 20vh auto;
+  margin: 18vh auto;
   background: black;
   color: white;
   padding: 2em; }
   .displayCard__title {
-    font-size: 5em; }
+    font-size: 2em; }
   .displayCard__lines {
-    font-size: 3em; }
+    font-size: 1.3em; }
     .displayCard__lines--circle {
       width: 1.7em;
       height: 1.7em;
@@ -56,7 +56,7 @@ body {
     .stationOrder__station--label {
       left: -2vw;
       top: -17vw;
-      font-size: 2em;
+      font-size: 0.75em;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -77,7 +77,7 @@ body {
       .stationOrder__station.selectedStation .stationOrder__station--label {
         display: none; }
       .stationOrder__station.selectedStation .stationOrder__station--lineLabel {
-        font-size: 8em;
+        font-size: 3em;
         top: 3.25vw; }
     .stationOrder__station--lineLabel {
       width: inherit;
@@ -85,11 +85,11 @@ body {
       vertical-align: middle;
       color: inherit;
       text-align: center;
-      font-size: 6em;
+      font-size: 2em;
       line-height: 13vw;
       position: absolute; }
   .stationOrder__selectedStationLabel {
-    font-size: 4em;
+    font-size: 2em;
     position: fixed;
     bottom: 5vh;
     margin: auto;

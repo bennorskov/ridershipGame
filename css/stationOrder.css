@@ -13,7 +13,6 @@
     border: solid black 1vw;
     width: 13vw;
     height: 13vw;
-    background: white;
     display: inline-block;
     position: relative;
     margin-top: -6.5vw;
@@ -30,7 +29,8 @@
       width: 15vh;
       transform: rotate(-65deg);
       position: absolute;
-      text-align: center; }
+      text-align: center;
+      color: #b3b3b3; }
     .stationOrder__station.selectedStation {
       border-radius: 11.5vw;
       width: 19vw;
@@ -42,12 +42,25 @@
       border: none; }
       .stationOrder__station.selectedStation .stationOrder__station--label {
         display: none; }
+      .stationOrder__station.selectedStation .stationOrder__station--lineLabel {
+        font-size: 8em;
+        top: 3.25vw; }
+    .stationOrder__station--lineLabel {
+      width: inherit;
+      height: inherit;
+      vertical-align: middle;
+      color: inherit;
+      text-align: center;
+      font-size: 6em;
+      line-height: 13vw;
+      position: absolute; }
   .stationOrder__selectedStationLabel {
     font-size: 4em;
     position: fixed;
     bottom: 5vh;
     margin: auto;
     width: 100%;
-    text-align: center; }
+    text-align: center;
+    color: white; }
 
 /*# sourceMappingURL=stationOrder.css.map */

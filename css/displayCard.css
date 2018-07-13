@@ -9,23 +9,16 @@
   .displayCard__lines {
     font-size: 3em; }
     .displayCard__lines--circle {
-      width: 2em;
-      height: 2em;
+      width: 1.7em;
+      height: 1.7em;
       margin-top: 0.5em;
       border-radius: 1em;
       text-align: center;
-      line-height: 2em;
+      line-height: 1.8em;
       font-weight: bold;
-      font-size: 1em;
+      font-size: 1.2em;
       vertical-align: middle;
       color: white;
       display: inline-block; }
-      .displayCard__lines--circle.fourfivesix {
-        background: #139240; }
-      .displayCard__lines--circle.nqr {
-        background: #fffd38;
-        color: black; }
-      .displayCard__lines--circle.l {
-        background: #999999; }
 
 /*# sourceMappingURL=displayCard.css.map */

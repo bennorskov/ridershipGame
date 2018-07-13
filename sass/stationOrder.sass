@@ -15,7 +15,6 @@ $stationMargin: $stationWidth/2 + 1
 		border: solid black 1vw
 		width: $stationWidth
 		height: $stationWidth
-		background: white
 		display: inline-block
 		position: relative
 		margin-top: -$stationMargin + 1
@@ -33,6 +32,7 @@ $stationMargin: $stationWidth/2 + 1
 			transform: rotate(-65deg)
 			position: absolute
 			text-align: center
+			color: #b3b3b3
 		&.selectedStation
 			border-radius: $stationMargin + 4
 			width: $stationWidth + 6
@@ -44,7 +44,19 @@ $stationMargin: $stationWidth/2 + 1
 			border: none
 			.stationOrder__station--label
 				display: none
-			
+			.stationOrder__station--lineLabel
+				font-size: 8em
+				top: $stationWidth * .25
+		@at-root #{&}--lineLabel
+			width: inherit
+			height: inherit
+			vertical-align: middle
+			//background: pink
+			color: inherit
+			text-align: center
+			font-size: 6em
+			line-height: $stationWidth
+			position: absolute
 	@at-root #{&}__selectedStationLabel
 		font-size: 4em
 		position: fixed
@@ -52,4 +64,5 @@ $stationMargin: $stationWidth/2 + 1
 		margin: auto
 		width: 100%
 		text-align: center
+		color: white
 

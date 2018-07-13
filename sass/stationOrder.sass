@@ -1,0 +1,55 @@
+$stationWidth: 13vw
+$stationMargin: $stationWidth/2 + 1
+.stationOrder
+	background: black
+	text-align: center
+	position: fixed
+	bottom: 17vh
+	height: 1vh
+	overflow: visible
+	white-space: nowrap
+	text-overflow: nowrap
+	@at-root #{&}__station
+		transition: all .2sec
+		border-radius: $stationMargin
+		border: solid black 1vw
+		width: $stationWidth
+		height: $stationWidth
+		background: white
+		display: inline-block
+		position: relative
+		margin-top: -$stationMargin + 1
+		margin-left: $stationMargin - 2
+		margin-right: $stationMargin - 2
+		margin-bottom: 0
+		@at-root #{&}--label
+			left: -2vw
+			top: -$stationWidth - 4
+			font-size: 2em
+			overflow: hidden
+			white-space: nowrap
+			text-overflow: ellipsis
+			width: 15vh
+			transform: rotate(-65deg)
+			position: absolute
+			text-align: center
+		&.selectedStation
+			border-radius: $stationMargin + 4
+			width: $stationWidth + 6
+			height: $stationWidth + 6
+			margin-top: -$stationMargin - 12
+			margin-left: $stationMargin
+			margin-right: $stationMargin
+			margin-bottom: -1.5vw
+			border: none
+			.stationOrder__station--label
+				display: none
+			
+	@at-root #{&}__selectedStationLabel
+		font-size: 4em
+		position: fixed
+		bottom: 5vh
+		margin: auto
+		width: 100%
+		text-align: center
+

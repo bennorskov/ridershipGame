@@ -1,0 +1,29 @@
+.displayCard
+	width: 70vw
+	margin: 20vh auto
+	background: black
+	color: white
+	padding: 2em
+	@at-root #{&}__title
+		font-size: 5em
+	@at-root #{&}__lines
+		font-size: 3em
+		@at-root #{&}--circle
+			width: 2em
+			height: 2em
+			margin-top: .5em
+			border-radius: 1em
+			text-align: center
+			line-height: 2em
+			font-weight: bold
+			font-size: 1em
+			vertical-align: middle
+			color: white
+			display: inline-block
+			&.fourfivesix
+				background: rgb(19, 146, 64)
+			&.nqr
+				background: rgb(255, 253, 56)
+				color: black
+			&.l
+				background: rgb(153, 153, 153)

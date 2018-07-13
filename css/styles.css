@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: Helvetica, sans-serif;
+  font-weight: bold; }
+
+body {
+  background: #205655; }
+
+.displayCard {
+  width: 70vw;
+  margin: 20vh auto;
+  background: black;
+  color: white;
+  padding: 2em; }
+  .displayCard__title {
+    font-size: 5em; }
+  .displayCard__lines {
+    font-size: 3em; }
+    .displayCard__lines--circle {
+      width: 2em;
+      height: 2em;
+      margin-top: 0.5em;
+      border-radius: 1em;
+      text-align: center;
+      line-height: 2em;
+      font-weight: bold;
+      font-size: 1em;
+      vertical-align: middle;
+      color: white;
+      display: inline-block; }
+      .displayCard__lines--circle.fourfivesix {
+        background: #139240; }
+      .displayCard__lines--circle.nqr {
+        background: #fffd38;
+        color: black; }
+      .displayCard__lines--circle.l {
+        background: #999999; }
+
+.stationOrder {
+  background: black;
+  text-align: center;
+  position: fixed;
+  bottom: 17vh;
+  height: 1vh;
+  overflow: visible;
+  white-space: nowrap;
+  text-overflow: nowrap; }
+  .stationOrder__station {
+    transition: all 0.2sec;
+    border-radius: 7.5vw;
+    border: solid black 1vw;
+    width: 13vw;
+    height: 13vw;
+    background: white;
+    display: inline-block;
+    position: relative;
+    margin-top: -6.5vw;
+    margin-left: 5.5vw;
+    margin-right: 5.5vw;
+    margin-bottom: 0; }
+    .stationOrder__station--label {
+      left: -2vw;
+      top: -17vw;
+      font-size: 2em;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      width: 15vh;
+      transform: rotate(-65deg);
+      position: absolute;
+      text-align: center; }
+    .stationOrder__station.selectedStation {
+      border-radius: 11.5vw;
+      width: 19vw;
+      height: 19vw;
+      margin-top: -19.5vw;
+      margin-left: 7.5vw;
+      margin-right: 7.5vw;
+      margin-bottom: -1.5vw;
+      border: none; }
+      .stationOrder__station.selectedStation .stationOrder__station--label {
+        display: none; }
+  .stationOrder__selectedStationLabel {
+    font-size: 4em;
+    position: fixed;
+    bottom: 5vh;
+    margin: auto;
+    width: 100%;
+    text-align: center; }
+
+/*# sourceMappingURL=styles.css.map */

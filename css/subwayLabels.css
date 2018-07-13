@@ -1,0 +1,32 @@
+.displayCard {
+  width: 70vw;
+  margin: 20vh auto;
+  background: black;
+  color: white;
+  padding: 2em;
+  padding-bottom: 4em; }
+  .displayCard__title {
+    font-size: 5em; }
+  .displayCard__lines {
+    margin: 2em 0 0;
+    font-size: 3em; }
+    .displayCard__lines--circle {
+      width: 2em;
+      height: 2em;
+      border-radius: 1em;
+      text-align: center;
+      line-height: 2em;
+      font-weight: bold;
+      font-size: 1em;
+      vertical-align: middle;
+      color: white;
+      display: inline-block; }
+      .displayCard__lines--circle.fourfivesix {
+        background: #139240; }
+      .displayCard__lines--circle.nqr {
+        background: #fffd38;
+        color: black; }
+      .displayCard__lines--circle.l {
+        background: #999999; }
+
+/*# sourceMappingURL=subwayLabels.css.map */

@@ -1,4 +1,4 @@
-
+var displayCard;
 var gameModule = (function () {
 	var currentStation = null;
 	var dataSet = {
@@ -12,36 +12,48 @@ var gameModule = (function () {
 		},
 		"Times Square-42 St": {
 			lines: ["n", "q", "r", "w", "s", "1", "2", "3", "7", "a", "c", "e"],
-			ridership: 64531511
+			ridership: 64815739
 		},
 		 "34 St-Herald Sq": {
 			lines: ["n", "q", "r", "w", "m", "f", "d", "b"],
-			ridership: 39000352
+			ridership: 39672507
 		},
 		"34 St-Penn Station": {
-			lines: ["1", "2", "3"],
-			ridership: 27741367		
-		},
-		"34 St-Penn Station": {
-			lines: ["a", "c", "e"],
-			ridership: 25183869
+			lines: ["1", "2", "3", "a", "c", "e"],
+			ridership: 50400738		
 		},
 		"Fulton St": {
 			lines: ["a", "c", "j", "z", "2", "3", "4", "5"],
-			ridership: 25162937
+			ridership: 26838473
 		},
 		"59 St-Columbus Circle": {
 			lines: ["a", "c", "d", "b", "1"],
-			ridership: 23203443
+			ridership: 22929203
 		},
 		"Lexington Av / 59 St": {
 			lines: ["4", "5", "6", "n", "w", "r"],
-			ridership: 21000635
+			ridership: 17888188
 		},
 		"86 St": {
 			lines: ["4", "5", "6"],
-			ridership: 20337593
-		} 
+			ridership: 14277369
+		},
+		"Lexington Av-53 St": {
+			lines: ["e", "m", "6"],
+			ridership: 18940774
+		},
+		"Flushing-Main St": {
+			lines: ["7"],
+			ridership: 18746832
+		},
+		"47-50 Sts-Rockefeller Center": {
+			lines: [],
+			ridership: 17471620
+		},
+		"74-Bway/Jackson Hts-Roosevelt Av": {
+			lines: [],
+			ridership: 17095073
+		}
 	};
 	function addLine( lineName ) {
 		var _html = '';
@@ -89,13 +101,25 @@ var gameModule = (function () {
 		_html += className + "'>" + lineName.toUpperCase() + "</div>";
 		return _html;
 	}
-	function checkSwipeVsSelected() {
+	function checkSwipeVsSelected(swipedStation, direction) {
+		console.log(swipedStation);
+		currentStation = document.getElementsByClassName("selectedStation")[0];
 		if (currentStation === null) {
 			addToBottomScroll();
 			return;
 		}
+		current = dataSet[swipedStation].ridership;
+		console.log(currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
+		selected = dataSet[ currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ].ridership;
+		if (current > selected && direction > 0) {
+			addToBottomScroll(swipedStation);
+		} else if (current < selected && direction < 0){
+			addToBottomScroll(swipedStation);
+		}
 	}
-	function addToBottomScroll() {}
+	function addToBottomScroll( elementToAdd ) {
+		console.log(elementToAdd + " Added to bottom!");
+	}
 
 	// ——————— ——————— public methods below
 	return {
@@ -106,14 +130,38 @@ var gameModule = (function () {
 		lockBottomScroll: function (buttonToLock) {},
 		checkSwipeAgainstSelected: function () {},
 		init: function () {
-			var displayCardToTest = document.getElementByClassName("displayCard");
-			Transform(displayCardToTest);
-			new AlloyFinger(displayCardToTest, {
+			displayCard = document.getElementsByClassName("displayCard")[0];
+			Transform(displayCard);
+			new AlloyFinger(displayCard, {
 			    pressMove:function(evt){
-			        displayCardToTest.translateX += evt.deltaX;
-			        displayCardToTest.translateY += evt.deltaY;
+			    	var maxMove = 100;
+			    	// var limit = Math.min(evt.deltaX
+			    	if ( Math.abs(displayCard.translateX + evt.deltaX) <= maxMove) {
+			        	displayCard.translateX += evt.deltaX;
+			        } else {
+			        	if (displayCard.translateX < 0) displayCard.translateX = -maxMove;
+			        	if (displayCard.translateX > 0) displayCard.translateX = maxMove;
+			        }
 			        evt.preventDefault();
-			        console.log(evt.deltaX);
+
+			    	var percentageOfMove = displayCard.translateX/maxMove;
+			    	var xRotationMax = 10,
+			    		yRotationMax = 20,
+			    		zRotationMax = 10;
+			    	displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
+			    	displayCard.rotateY = percentageOfMove * yRotationMax;
+			    	displayCard.rotateZ = percentageOfMove * zRotationMax;
+			    },
+			    touchEnd: function() {
+			    	if (displayCard.translateX > 70) {
+			    		checkSwipeVsSelected( displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
+			    	} else if (displayCard.translateX < -70) {
+			    		checkSwipeVsSelected( displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
+			    	}
+			    	displayCard.translateX = 0;
+			    	displayCard.rotateX = 0;
+			    	displayCard.rotateY = 0;
+			    	displayCard.rotateZ = 0;
 			    }
 			});
 		}

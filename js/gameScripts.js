@@ -1,58 +1,61 @@
 var timeout = null;
 var gameModule = (function () {
-	var dataSet = {
-		"14th St-Union Square": {
+	var dataSet = new Map();
+	var displayedStations = new Map();
+	function setupDataObject() {
+		dataSet.set( 
+			"14th St-Union Square", {
 			lines: ["4", "5", "6", "n", "q", "r", "l"],
 			ridership: 34557551
-		},
-		"Grand Central-42nd St": {
+		});
+		dataSet.set( "Grand Central-42nd St", {
 			lines: ["4", "5", "6", "7", "s"],
 			ridership: 44928488
-		},
-		"Times Square-42 St": {
+		});
+		dataSet.set("Times Square-42 St", {
 			lines: ["n", "q", "r", "w", "s", "1", "2", "3", "7", "a", "c", "e"],
 			ridership: 64815739
-		},
-		 "34 St-Herald Sq": {
+		});
+		dataSet.set( "34 St-Herald Sq", {
 			lines: ["n", "q", "r", "w", "m", "f", "d", "b"],
 			ridership: 39672507
-		},
-		"34 St-Penn Station": {
+		});
+		dataSet.set("34 St-Penn Station", {
 			lines: ["1", "2", "3", "a", "c", "e"],
 			ridership: 50400738		
-		},
-		"Fulton St": {
+		});
+		dataSet.set("Fulton St", {
 			lines: ["a", "c", "j", "z", "2", "3", "4", "5"],
 			ridership: 26838473
-		},
-		"59 St-Columbus Circle": {
+		});
+		dataSet.set("59 St-Columbus Circle", {
 			lines: ["a", "c", "d", "b", "1"],
 			ridership: 22929203
-		},
-		"Lexington Av / 59 St": {
+		});
+		dataSet.set("Lexington Av / 59 St", {
 			lines: ["4", "5", "6", "n", "w", "r"],
 			ridership: 17888188
-		},
-		"86 St": {
+		});
+		dataSet.set("86 St", {
 			lines: ["4", "5", "6"],
 			ridership: 14277369
-		},
-		"Lexington Av-53 St": {
+		});
+		dataSet.set("Lexington Av-53 St", {
 			lines: ["e", "m", "6"],
 			ridership: 18940774
-		},
-		"Flushing-Main St": {
+		});
+		dataSet.set("Flushing-Main St", {
 			lines: ["7"],
 			ridership: 18746832
-		},
-		"47-50 Sts-Rockefeller Center": {
-			lines: [],
+		});
+		dataSet.set("47-50 Sts-Rockefeller Center", {
+			lines: ["b", "d", "f", "m"],
 			ridership: 17471620
-		},
-		"74-Bway/Jackson Hts-Roosevelt Av": {
-			lines: [],
+		});
+		dataSet.set("74-Bway/Jackson Hts-Roosevelt Av", {
+			lines: ["e"],
 			ridership: 17095073
-		}
+		});
 	};
 	function returnClassNameFromLineName(lineName) {
 		var className;
@@ -106,28 +109,37 @@ var gameModule = (function () {
 	}
 	function checkSwipeVsSelected(swipedStation, direction) {
 		// console.log(swipedStation);
+		//
 		// temp test code:
 		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];
 		console.log(gameModule.currentStation);
 		// end test code
+		//
 		if (gameModule.currentStation === null) {
+			console.log("current Station was null!");
 			addToBottomScroll(swipedStation);
 			return;
 		}
-		current = dataSet[swipedStation].ridership;
+		current = dataSet.get(swipedStation).ridership;
 		console.log(gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
-		selected = dataSet[ gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ].ridership;
+		selected = dataSet.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
 		if (current > selected && direction > 0) { // bigger swipe (right)
 			addToBottomScroll(swipedStation);
 		} else if (current < selected && direction < 0){ // smaller swipe (left)
 			addToBottomScroll(swipedStation);
 		}
-		changeDisplayCard("Lexington Av-53 St");
+		changeDisplayCard( getRandomStationName() );
+	}
+	function getRandomStationName() {
+		var keyArray = Array.from(dataSet.keys());
+
+		return keyArray[ Math.floor(keyArray.length * Math.random()) ];
+		//"Lexington Av-53 St";
 	}
 	function addToBottomScroll( stationToAdd ) {
 		console.log(stationToAdd + " Added to bottom!");
 		var statOrd = document.getElementsByClassName("stationOrder")[0];
-		var lineName = dataSet[stationToAdd].lines[ Math.floor(dataSet[stationToAdd].lines.length * Math.random()) ];
+		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
 		var _html = "<div class='stationOrder__station selectedStation " + className + "'>";
 		_html += "<h1 class='stationOrder__station--label'>" + stationToAdd + "</h1>";
@@ -138,12 +150,18 @@ var gameModule = (function () {
 		console.log("Temp is " + temp.innerHTML);
 		statOrd.appendChild(temp.content.firstChild);
 		gameModule.currentStation = temp;
+		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
+		dataSet.delete(stationToAdd);
 	}
 	function changeDisplayCard(stationName) {
-		console.log("added " + stationName + " card")
+		// change the card that you swipe to test the riderships
+		console.log("adding " + stationName + " card");
+
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
 		_html += "<div class='displayCard__lines'>";
-		var lines = dataSet[stationName].lines;
+
+		// add line circles to main card
+		var lines = dataSet.get(stationName).lines;
 		for (var i = lines.length - 1; i >= 0; i--) {
 			_html += addLineToDisplayCard(lines[i]) + " ";
 		};
@@ -221,7 +239,8 @@ var gameModule = (function () {
 			});
 		},
 		init: function () {
-			this.displayCard = document.getElementsByClassName("displayCard")[0];
+			setupDataObject();
+			gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.setupSwipeEvent();
 		}
 	}

@@ -1,4 +1,5 @@
 var displayCard;
+var timeout = null;
 var gameModule = (function () {
 	var currentStation = null;
 	var dataSet = {
@@ -134,6 +135,7 @@ var gameModule = (function () {
 			Transform(displayCard);
 			new AlloyFinger(displayCard, {
 			    pressMove:function(evt){
+			    	if (timeout != null) clearInterval(timeout);
 			    	var maxMove = 100;
 			    	// var limit = Math.min(evt.deltaX
 			    	if ( Math.abs(displayCard.translateX + evt.deltaX) <= maxMove) {
@@ -152,16 +154,38 @@ var gameModule = (function () {
 			    	displayCard.rotateY = percentageOfMove * yRotationMax;
 			    	displayCard.rotateZ = percentageOfMove * zRotationMax;
 			    },
+			    // Either: Check to see if the card should add, 
+			    // OR: Put the card back into place
 			    touchEnd: function() {
-			    	if (displayCard.translateX > 70) {
+			    	var maxMove = 100;
+			    	if (timeout != null) clearInterval(timeout);
+			    	var completePercentage = .85;
+			    	var percentageOfMove = displayCard.translateX/maxMove;
+			    	if (displayCard.translateX/maxMove > completePercentage) {
 			    		checkSwipeVsSelected( displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    	} else if (displayCard.translateX < -70) {
+			    	} else if (displayCard.translateX/maxMove < -completePercentage) {
 			    		checkSwipeVsSelected( displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
-			    	}
-			    	displayCard.translateX = 0;
-			    	displayCard.rotateX = 0;
-			    	displayCard.rotateY = 0;
-			    	displayCard.rotateZ = 0;
+			    	} else {
+			    		timeout = setInterval(function () {
+					    	var xRotationMax = 10,
+					    		yRotationMax = 20,
+					    		zRotationMax = 10;
+					    	var easeAmount = .55;
+					    	displayCard.translateX += (0 - displayCard.translateX) * easeAmount;
+					    	percentageOfMove = displayCard.translateX/maxMove; // calculate after movement for rotation
+					    	displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
+					    	displayCard.rotateY = percentageOfMove * yRotationMax;
+					    	displayCard.rotateZ = percentageOfMove * zRotationMax;
+					    	if (Math.abs(percentageOfMove) < .05) {
+					    		console.log("interval cleared!");
+					    		clearInterval(timeout);
+						    	displayCard.translateX = 0;
+						    	displayCard.rotateX = 0;
+						    	displayCard.rotateY = 0;
+						    	displayCard.rotateZ = 0;
+					    	}
+			    		}, 50);
+				    }
 			    }
 			});
 		}

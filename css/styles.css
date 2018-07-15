@@ -33,14 +33,14 @@ body {
       display: inline-block; }
 
 .stationOrder {
-  background: black;
   text-align: center;
   position: fixed;
-  bottom: 17vh;
-  height: 1vh;
+  bottom: 13vh;
+  height: 13vw;
   overflow: visible;
   white-space: nowrap;
-  text-overflow: nowrap; }
+  text-overflow: nowrap;
+  left: 0px; }
   .stationOrder__station {
     transition: all 0.2sec;
     border-radius: 7.5vw;

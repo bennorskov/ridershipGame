@@ -1,14 +1,14 @@
 $stationWidth: 13vw
 $stationMargin: $stationWidth/2 + 1
 .stationOrder
-	background: black
 	text-align: center
 	position: fixed
-	bottom: 17vh
-	height: 1vh
+	bottom: 13vh
+	height: $stationWidth
 	overflow: visible
 	white-space: nowrap
 	text-overflow: nowrap
+	left: 0px
 	@at-root #{&}__station
 		transition: all .2sec
 		border-radius: $stationMargin

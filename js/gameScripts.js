@@ -136,6 +136,21 @@ var gameModule = (function () {
 		return keyArray[ Math.floor(keyArray.length * Math.random()) ];
 		//"Lexington Av-53 St";
 	}
+	function changeDisplayCard(stationName) {
+		// change the card that you swipe to test the riderships
+		console.log("adding " + stationName + " card");
+
+		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
+		_html += "<div class='displayCard__lines'>";
+
+		// add line circles to main card
+		var lines = dataSet.get(stationName).lines;
+		for (var i = lines.length - 1; i >= 0; i--) {
+			_html += addLineToDisplayCard(lines[i]) + " ";
+		};
+		_html += "</div>";
+		gameModule.displayCard.innerHTML = _html;
+	}
 	function addToBottomScroll( stationToAdd ) {
 		console.log(stationToAdd + " Added to bottom!");
 		var statOrd = document.getElementsByClassName("stationOrder")[0];
@@ -153,20 +168,32 @@ var gameModule = (function () {
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
 		dataSet.delete(stationToAdd);
 	}
-	function changeDisplayCard(stationName) {
-		// change the card that you swipe to test the riderships
-		console.log("adding " + stationName + " card");
+	function lockBottomScroll ( stationToLock ) {
+		var bottomScrollChildren = gameModule.bottomScrollContainer.children;
+		var bSLeft = gameModule.bottomScrollContainer.offsetLeft;
+		var bSWidth = gameModule.bottomScrollContainer.offsetWidth;
+		var screenMiddle = window.screen.width * .5;
 
-		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
-		_html += "<div class='displayCard__lines'>";
+		//stationToLock is used when clicking on a button 
+		if (stationToLock == null || stationToLock == undefined) {
+			//find closest button to center
+			var closestAmount = screenMiddle;
+			for (let chi of bottomScrollChildren) {
+				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
+				if (Math.abs(screenMiddle - (centerOfStation + bSLeft)) < closestAmount) {
+					closestAmount = Math.abs(screenMiddle - (centerOfStation + bSLeft));
+					stationToLock = chi;
+				}
+			}
+		}
+		// select station by making it bigger and removing outline
+		stationToLock.classList.add("selectedStation");
+		console.log(stationToLock.children[0]);
+		//set bottom text to station name
+		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
 
-		// add line circles to main card
-		var lines = dataSet.get(stationName).lines;
-		for (var i = lines.length - 1; i >= 0; i--) {
-			_html += addLineToDisplayCard(lines[i]) + " ";
-		};
-		_html += "</div>";
-		gameModule.displayCard.innerHTML = _html;
+		//scroll parent to that spot
+
 	}
 
 	// ——————— ——————— public methods below
@@ -175,11 +202,26 @@ var gameModule = (function () {
 			return dataSet;
 		},
 		displayCard: "",
+		bottomScrollContainer: "",
 		currentStation: null,
-		lockBottomScroll: function (buttonToLock) {},
 		checkSwipeAgainstSelected: function () {},
 		setupSwipeEvent: function () {
-			// set up swipe event
+			// ————— ————— ————— ————— set up swipe event for bottom container
+			new AlloyFinger(this.bottomScrollContainer, {
+				pressMove: function(evt) {
+					var selected = document.getElementsByClassName("selectedStation")[0] || null;
+					if (selected != null) {
+						selected.classList.remove("selectedStation");
+					}
+					var curLeft = gameModule.bottomScrollContainer.offsetLeft;;
+					gameModule.bottomScrollContainer.style.left = (curLeft + evt.deltaX) + "px";
+				}, 
+				touchEnd: function(evt) {
+					lockBottomScroll();
+				}
+			});
+
+			// ————— ————— ————— ————— set up swipe event for main card
 			Transform(this.displayCard);
 			new AlloyFinger(this.displayCard, {
 			    pressMove:function(evt){
@@ -241,6 +283,7 @@ var gameModule = (function () {
 		init: function () {
 			setupDataObject();
 			gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
+			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
 			gameModule.setupSwipeEvent();
 		}
 	}

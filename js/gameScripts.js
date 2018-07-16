@@ -247,36 +247,21 @@ var gameModule = (function () {
 			    // Either: Check to see if the card should add, 
 			    // OR: Put the card back into place
 			    touchEnd: function() {
+
 			    	var maxMove = 100;
-			    	if (timeout != null) clearInterval(timeout);
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
+
+			    	// did you swipe long enough to check the card?
 			    	if (gameModule.displayCard.translateX/maxMove > completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    		//gameModule.displayCard.parentNode.removeChild(gameModule.displayCard);
 			    	} else if (gameModule.displayCard.translateX/maxMove < -completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
-			    		//gameModule.displayCard.parentNode.removeChild(gameModule.displayCard);
 			    	}
-		    		timeout = setInterval(function () {
-				    	var xRotationMax = 10,
-				    		yRotationMax = 20,
-				    		zRotationMax = 10;
-				    	var easeAmount = .55;
-				    	gameModule.displayCard.translateX += (0 - gameModule.displayCard.translateX) * easeAmount;
-				    	percentageOfMove = gameModule.displayCard.translateX/maxMove; // calculate after movement for rotation
-				    	gameModule.displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
-				    	gameModule.displayCard.rotateY = percentageOfMove * yRotationMax;
-				    	gameModule.displayCard.rotateZ = percentageOfMove * zRotationMax;
-				    	if (Math.abs(percentageOfMove) < .05) {
-				    		// console.log("interval cleared!");
-				    		clearInterval(timeout);
-					    	gameModule.displayCard.translateX = 0;
-					    	gameModule.displayCard.rotateX = 0;
-					    	gameModule.displayCard.rotateY = 0;
-					    	gameModule.displayCard.rotateZ = 0;
-				    	}
-		    		}, 50);
+
+			    	gameModule.animateMainCard = true;
+			    	gameModule.animate();
+		    		
 			    }
 			});
 		},
@@ -285,8 +270,35 @@ var gameModule = (function () {
 			gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
 			gameModule.setupSwipeEvent();
+		},
+		animateMainCard: false,
+		animateBottomSlide: false,
+		animate: function () {
+			if (gameModule.animateMainCard) {
+		    	var maxMove = 100;
+		    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
+		    	var xRotationMax = 10,
+		    		yRotationMax = 20,
+		    		zRotationMax = 10;
+		    	var easeAmount = .55;
+		    	gameModule.displayCard.translateX += (0 - gameModule.displayCard.translateX) * easeAmount;
+		    	percentageOfMove = gameModule.displayCard.translateX/maxMove; // calculate after movement for rotation
+		    	gameModule.displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
+		    	gameModule.displayCard.rotateY = percentageOfMove * yRotationMax;
+		    	gameModule.displayCard.rotateZ = percentageOfMove * zRotationMax;
+		    	if (Math.abs(percentageOfMove) < .05) {
+		    		// console.log("interval cleared!");
+		    		gameModule.animateMainCard = false;
+			    	gameModule.displayCard.translateX = 0;
+			    	gameModule.displayCard.rotateX = 0;
+			    	gameModule.displayCard.rotateY = 0;
+			    	gameModule.displayCard.rotateZ = 0;
+		    	}
+		    }
+			if (gameModule.animateMainCard || gameModule.animateBottomSlide) window.requestAnimationFrame(gameModule.animate);
 		}
 	}
 })();
+
 
 

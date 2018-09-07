@@ -1,8 +1,37 @@
+/*
+*	Main Game engine
+*
+* 	There is one global object that the game runs with, "gameModule"
+*	All functions are based inside that global object
+*	The object is set up in the gameModule.init() function called from body => onload
+*
+*	Anything with "function" is private inside of gameModule
+*
+*	Anything in the "return" are publically accessible. You can call them from 
+*		anywhere else in the code as decendents of gameModule. (eg "gameModule.getDataSet();" )
+*
+*	
+*
+*/
+
 var timeout = null;
 var gameModule = (function () {
+	// As the game progresses, move stations into displayStations and delete from dataSet
 	var dataSet = new Map();
 	var displayedStations = new Map();
 	function setupDataObject() {
+		/*
+		*	Syntaxt for acessing data:
+		*	dataSet.get( [station name as string] ).ridership
+		*	
+		* 	eg: "dataSet.get('34 St-Herald Sq').ridership" returns 39672507 as a number
+		*	"dataSet.get('34 St-Herald Sq').lines" returns an array of strings: ["n", "q", "r", "w", "m", "f", "d", "b"]
+		*
+		*	The logic here is that we can use the names of stations as the key for an associative array
+		*	That way, we can just call any data from a station using its name
+		*	(The downside is that it's rather easy to mistype/spell station names, so watch for that)
+		*/
+
 		dataSet.set( 
 			"14th St-Union Square", {
 			lines: ["4", "5", "6", "n", "q", "r", "l"],
@@ -58,6 +87,8 @@ var gameModule = (function () {
 		});
 	};
 	function returnClassNameFromLineName(lineName) {
+		// the line names don't line up with the css for their color
+		// this function takes a line name (eg a, 6, l) and returns the css for it's color
 		var className;
 		switch(lineName) {
 			case "4":
@@ -101,6 +132,8 @@ var gameModule = (function () {
 		return className;
 	};
 	function addLineToDisplayCard( lineName ) {
+		// put a line on the center card
+		// concatenate html into one string then return that string
 		var _html = '';
 		var className = returnClassNameFromLineName(lineName);
 		_html += "<div class='displayCard__lines--circle ";
@@ -108,21 +141,34 @@ var gameModule = (function () {
 		return _html;
 	}
 	function checkSwipeVsSelected(swipedStation, direction) {
-		// console.log(swipedStation);
-		//
-		// temp test code:
+		/* 
+		*	check the displayCard vs the selectedStation. 
+		*	swipedStation is a string
+		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
+		*/
+
+		// temp test code, comment out if things are workign:
 		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];
 		console.log(gameModule.currentStation);
 		// end test code
-		//
+
 		if (gameModule.currentStation === null) {
+			// if first station. There is nothing to compare, just add it!
 			console.log("current Station was null!");
 			addToBottomScroll(swipedStation);
-			return;
+			return; // ignore below and return void
 		}
+
+		// store ridership in "current" and "selected" then compare
 		current = dataSet.get(swipedStation).ridership;
 		console.log(gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
 		selected = dataSet.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
+		
+		/*
+		*	Future step! (Issue created on github)
+		* 	Need to check against all added stations
+		*	Right now, we're only checking against the selected station
+		*/
 		if (current > selected && direction > 0) { // bigger swipe (right)
 			addToBottomScroll(swipedStation);
 		} else if (current < selected && direction < 0){ // smaller swipe (left)
@@ -131,13 +177,13 @@ var gameModule = (function () {
 		changeDisplayCard( getRandomStationName() );
 	}
 	function getRandomStationName() {
+		// find a random station name from all station names not yet added
 		var keyArray = Array.from(dataSet.keys());
 
 		return keyArray[ Math.floor(keyArray.length * Math.random()) ];
-		//"Lexington Av-53 St";
 	}
 	function changeDisplayCard(stationName) {
-		// change the card that you swipe to test the riderships
+		// change the displayCard that you swipe to test against selectedStation
 		console.log("adding " + stationName + " card");
 
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
@@ -153,31 +199,44 @@ var gameModule = (function () {
 	}
 	function addToBottomScroll( stationToAdd ) {
 		console.log(stationToAdd + " Added to bottom!");
+
+		// "stationOrder" is the class name of the bottom bar. 
+		// we could improve performance by storing this in a variable like gameModule.displayCard
 		var statOrd = document.getElementsByClassName("stationOrder")[0];
+
+		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
 		var _html = "<div class='stationOrder__station selectedStation " + className + "'>";
 		_html += "<h1 class='stationOrder__station--label'>" + stationToAdd + "</h1>";
 		_html += "<h1 class='stationOrder__station--lineLabel'>"+ lineName.toUpperCase() +"</h1>";
 		_html += "</div>";
+
+		// it's less hacky to create a temporary dom element than use a hidden one
 		var temp = document.createElement("template");
-		temp.innerHTML = _html.trim();
+		temp.innerHTML = _html.trim(); // remove extra whitespace
 		console.log("Temp is " + temp.innerHTML);
 		statOrd.appendChild(temp.content.firstChild);
 		gameModule.currentStation = temp;
+		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
 		dataSet.delete(stationToAdd);
 	}
 	function lockBottomScroll ( stationToLock ) {
+		// stationToLock is a dom element or null
+		// eventually we should click on a station and it'll scroll to it
+
 		var bottomScrollChildren = gameModule.bottomScrollContainer.children;
 		var bSLeft = gameModule.bottomScrollContainer.offsetLeft;
 		var bSWidth = gameModule.bottomScrollContainer.offsetWidth;
 		var screenMiddle = window.screen.width * .5;
 
-		//stationToLock is used when clicking on a button 
+		// if a swipe, then stationToLock will be null, so we have to find the most middle station
 		if (stationToLock == null || stationToLock == undefined) {
 			//find closest button to center
 			var closestAmount = screenMiddle;
+			// cycle through children until you find the closest child to the center. 
+			// select it
 			for (let chi of bottomScrollChildren) {
 				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
 				if (Math.abs(screenMiddle - (centerOfStation + bSLeft)) < closestAmount) {
@@ -186,25 +245,27 @@ var gameModule = (function () {
 				}
 			}
 		}
+		// if you pressed on a button, stationToLock should already be set
+
 		// select station by making it bigger and removing outline
 		stationToLock.classList.add("selectedStation");
 		console.log(stationToLock.children[0]);
 		//set bottom text to station name
 		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
 
-		//scroll parent to that spot
-
+		// FUTURE!
+		// animate scroll parent to that spot
 	}
 
 	// ——————— ——————— public methods below
 	return {
 		getDataSet: function() {
+			// dataSet is private
 			return dataSet;
 		},
 		displayCard: "",
 		bottomScrollContainer: "",
 		currentStation: null,
-		checkSwipeAgainstSelected: function () {},
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
 			new AlloyFinger(this.bottomScrollContainer, {
@@ -247,7 +308,7 @@ var gameModule = (function () {
 			    // Either: Check to see if the card should add, 
 			    // OR: Put the card back into place
 			    touchEnd: function() {
-
+			    	// touchEnd is a funciton from Alloy. It's when your finger lifts 
 			    	var maxMove = 100;
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
@@ -271,9 +332,15 @@ var gameModule = (function () {
 			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
 			gameModule.setupSwipeEvent();
 		},
+		// ———— ———— animation flags:
 		animateMainCard: false,
 		animateBottomSlide: false,
 		animate: function () {
+			/* 
+			*	recursive call to the animation funciton. 
+			*	call gameModule.animate() after setting animation flags to true
+			*	and animate will call itself until flags are false. 
+			*/
 			if (gameModule.animateMainCard) {
 		    	var maxMove = 100;
 		    	var xRotationMax = 10,
@@ -296,9 +363,12 @@ var gameModule = (function () {
 		    }
 		    if (gameModule.animateBottomSlide) {
 		    	// Move until the selected station is in the middle
-		    	
+		    	// this is where the bottom slide should lock in place
 		    }
-			if (gameModule.animateMainCard || gameModule.animateBottomSlide) window.requestAnimationFrame(gameModule.animate);
+			if (gameModule.animateMainCard || gameModule.animateBottomSlide) { 
+				// recursion. window.request... is a more performant animation function than setInterval
+				window.requestAnimationFrame(gameModule.animate); 
+			}
 		}
 	}
 })();

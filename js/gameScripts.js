@@ -276,24 +276,27 @@ var gameModule = (function () {
 		animate: function () {
 			if (gameModule.animateMainCard) {
 		    	var maxMove = 100;
-		    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
 		    	var xRotationMax = 10,
 		    		yRotationMax = 20,
 		    		zRotationMax = 10;
 		    	var easeAmount = .55;
 		    	gameModule.displayCard.translateX += (0 - gameModule.displayCard.translateX) * easeAmount;
-		    	percentageOfMove = gameModule.displayCard.translateX/maxMove; // calculate after movement for rotation
+		    	var percentageOfMove = gameModule.displayCard.translateX/maxMove; // calculate after movement for rotation
 		    	gameModule.displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
 		    	gameModule.displayCard.rotateY = percentageOfMove * yRotationMax;
 		    	gameModule.displayCard.rotateZ = percentageOfMove * zRotationMax;
+		    	// end and reset the animation if you're close enough
 		    	if (Math.abs(percentageOfMove) < .05) {
-		    		// console.log("interval cleared!");
 		    		gameModule.animateMainCard = false;
 			    	gameModule.displayCard.translateX = 0;
 			    	gameModule.displayCard.rotateX = 0;
 			    	gameModule.displayCard.rotateY = 0;
 			    	gameModule.displayCard.rotateZ = 0;
 		    	}
+		    }
+		    if (gameModule.animateBottomSlide) {
+		    	// Move until the selected station is in the middle
+		    	
 		    }
 			if (gameModule.animateMainCard || gameModule.animateBottomSlide) window.requestAnimationFrame(gameModule.animate);
 		}

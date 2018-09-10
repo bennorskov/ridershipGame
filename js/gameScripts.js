@@ -240,17 +240,37 @@ var gameModule = (function () {
 
 		// if a swipe, then stationToLock will be null, so we have to find the most middle station
 		if (stationToLock == null || stationToLock == undefined) {
-			//find closest button to center
+//			//find closest button to center
+//			var closestAmount = screenMiddle;
+//			// cycle through children until you find the closest child to the center. 
+//			// select it
+//			for (let chi of bottomScrollChildren) {
+//				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
+//				if (Math.abs(screenMiddle - (centerOfStation + bSLeft)) < closestAmount) {
+//					closestAmount = Math.abs(screenMiddle - (centerOfStation + bSLeft));
+//					stationToLock = chi;
+//				}
+//			}
+            
+            // FUTURE!
+            // animate scroll parent to that spot
+            // here's a cheap non-animated fix 
+            // cycle through children and shift them all towards the middle by the difference of closest to middle
+            //find closest button to center
 			var closestAmount = screenMiddle;
 			// cycle through children until you find the closest child to the center. 
 			// select it
 			for (let chi of bottomScrollChildren) {
 				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
-				if (Math.abs(screenMiddle - (centerOfStation + bSLeft)) < closestAmount) {
-					closestAmount = Math.abs(screenMiddle - (centerOfStation + bSLeft));
+                var difference = screenMiddle - (centerOfStation + bSLeft);
+				if (Math.abs(difference) < closestAmount) {
+					closestAmount = Math.abs(difference);
 					stationToLock = chi;
 				}
 			}
+            console.log("difference: " + difference);
+            var curLeft = gameModule.bottomScrollContainer.offsetLeft;
+            gameModule.bottomScrollContainer.style.left = (curLeft + difference) + "px";
 		}
 		// if you pressed on a button, stationToLock should already be set
 
@@ -260,8 +280,7 @@ var gameModule = (function () {
 		//set bottom text to station name
 		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
 
-		// FUTURE!
-		// animate scroll parent to that spot
+		
 	}
 
 	// ——————— ——————— public methods below
@@ -281,7 +300,7 @@ var gameModule = (function () {
 					if (selected != null) {
 						selected.classList.remove("selectedStation");
 					}
-					var curLeft = gameModule.bottomScrollContainer.offsetLeft;;
+					var curLeft = gameModule.bottomScrollContainer.offsetLeft;
 					gameModule.bottomScrollContainer.style.left = (curLeft + evt.deltaX) + "px";
 				}, 
 				touchEnd: function(evt) {

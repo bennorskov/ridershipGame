@@ -16,7 +16,7 @@
 
 var timeout = null;
 var gameModule = (function () {
-	// As the game progresses, move stations into displayStations and delete from dataSet
+	// As the game progresses, move stations into displayedStations and delete from dataSet
 	var dataSet = new Map();
 	var displayedStations = new Map();
 	function setupDataObject() {
@@ -147,7 +147,7 @@ var gameModule = (function () {
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
 
-		// temp test code, comment out if things are workign:
+		// temp test code, comment out if things are working:
 		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];
 		console.log(gameModule.currentStation);
 		// end test code
@@ -164,6 +164,10 @@ var gameModule = (function () {
 		console.log(gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
 		selected = dataSet.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
 		
+        // more temporary test code to help with comparisons
+        console.log(current + ": " + swipedStation + "\n" + selected + ": " + gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+        // end test code
+        
 		/*
 		*	Future step! (Issue created on github)
 		* 	Need to check against all added stations
@@ -174,6 +178,9 @@ var gameModule = (function () {
 		} else if (current < selected && direction < 0){ // smaller swipe (left)
 			addToBottomScroll(swipedStation);
 		}
+        else {  
+             console.log("Game Over!")
+        }
 		changeDisplayCard( getRandomStationName() );
 	}
 	function getRandomStationName() {

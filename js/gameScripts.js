@@ -232,55 +232,39 @@ var gameModule = (function () {
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
 		// eventually we should click on a station and it'll scroll to it
-
 		var bottomScrollChildren = gameModule.bottomScrollContainer.children;
 		var bSLeft = gameModule.bottomScrollContainer.offsetLeft;
 		var bSWidth = gameModule.bottomScrollContainer.offsetWidth;
 		var screenMiddle = window.screen.width * .5;
-
-		// if a swipe, then stationToLock will be null, so we have to find the most middle station
+		
+        // if a swipe, then stationToLock will be null, so we have to find the most middle station
 		if (stationToLock == null || stationToLock == undefined) {
-//			//find closest button to center
-//			var closestAmount = screenMiddle;
-//			// cycle through children until you find the closest child to the center. 
-//			// select it
-//			for (let chi of bottomScrollChildren) {
-//				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
-//				if (Math.abs(screenMiddle - (centerOfStation + bSLeft)) < closestAmount) {
-//					closestAmount = Math.abs(screenMiddle - (centerOfStation + bSLeft));
-//					stationToLock = chi;
-//				}
-//			}
-            
-            // FUTURE!
-            // animate scroll parent to that spot
-            // here's a cheap non-animated fix 
-            // cycle through children and shift them all towards the middle by the difference of closest to middle
             //find closest button to center
 			var closestAmount = screenMiddle;
 			// cycle through children until you find the closest child to the center. 
 			// select it
 			for (let chi of bottomScrollChildren) {
-				var centerOfStation = chi.offsetLeft + chi.offsetWidth*.5;
+				var centerOfStation = chi.offsetLeft + (chi.offsetWidth*.5);
                 var difference = screenMiddle - (centerOfStation + bSLeft);
 				if (Math.abs(difference) < closestAmount) {
 					closestAmount = Math.abs(difference);
-					stationToLock = chi;
+					stationToLock = chi;                    
 				}
-			}
-            console.log("difference: " + difference);
-            var curLeft = gameModule.bottomScrollContainer.offsetLeft;
-            gameModule.bottomScrollContainer.style.left = (curLeft + difference) + "px";
+			}    
 		}
 		// if you pressed on a button, stationToLock should already be set
-
+               
 		// select station by making it bigger and removing outline
 		stationToLock.classList.add("selectedStation");
 		console.log(stationToLock.children[0]);
-		//set bottom text to station name
+		// set bottom text to station name
 		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
-
-		
+        // FUTURE!
+        // animate scroll parent to that spot
+        // here's a cheap, non-animated fix 
+        // offset container to lock selected station in center of screen
+        var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);
+        gameModule.bottomScrollContainer.style.left = (screenMiddle - adjust) + "px";
 	}
 
 	// ——————— ——————— public methods below
@@ -299,9 +283,24 @@ var gameModule = (function () {
 					var selected = document.getElementsByClassName("selectedStation")[0] || null;
 					if (selected != null) {
 						selected.classList.remove("selectedStation");
+// Hide stationOrder__selectedStationLabel
+document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";                   
+// FUTURE?
+// disappear stationOrder__selectedStationLabel while event is active
+// Or, change label to be station currently closest to center
+// Also, add inertia scrolling to swipes?                        
 					}
+                    // Move container with swipe, restricting container from leaving the screen
 					var curLeft = gameModule.bottomScrollContainer.offsetLeft;
-					gameModule.bottomScrollContainer.style.left = (curLeft + evt.deltaX) + "px";
+                    var newPosition = evt.deltaX + curLeft;
+                    if(newPosition > (window.screen.width * .5)) {
+                        newPosition = window.screen.width * .5;
+                    }
+                    else if(newPosition < (0 - gameModule.bottomScrollContainer.offsetWidth) + (window.screen.width * .5)) {
+                        newPosition = (0 - gameModule.bottomScrollContainer.offsetWidth) + (window.screen.width * .5);
+                    }
+                    
+					gameModule.bottomScrollContainer.style.left = newPosition + "px";
 				}, 
 				touchEnd: function(evt) {
 					lockBottomScroll();
@@ -356,6 +355,11 @@ var gameModule = (function () {
 			setupDataObject();
 			gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
+// FUTURE! 
+// init stationOrder bar with 3 random stations
+// init displayCard with random station
+// initialize bottomScrollContainer to be centered, specifically on selected station
+
 			gameModule.setupSwipeEvent();
 		},
 		// ———— ———— animation flags:

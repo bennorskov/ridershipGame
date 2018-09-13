@@ -259,12 +259,9 @@ var gameModule = (function () {
 		console.log(stationToLock.children[0]);
 		// set bottom text to station name
 		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
-        // FUTURE!
-        // animate scroll parent to that spot
-        // here's a cheap, non-animated fix 
-        // offset container to lock selected station in center of screen
-        var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);
-        gameModule.bottomScrollContainer.style.left = (screenMiddle - adjust) + "px";
+        // Animate scroll to lock selected station in the screen middle
+        gameModule.animateBottomSlide = true;
+        gameModule.animate();
 	}
 
 	// ——————— ——————— public methods below
@@ -283,29 +280,28 @@ var gameModule = (function () {
 					var selected = document.getElementsByClassName("selectedStation")[0] || null;
 					if (selected != null) {
 						selected.classList.remove("selectedStation");
-// Hide stationOrder__selectedStationLabel
-document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";                   
+                        document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
 // FUTURE?
-// disappear stationOrder__selectedStationLabel while event is active
-// Or, change label to be station currently closest to center
+// change large label to be station currently closest to center?
 // Also, add inertia scrolling to swipes?                        
 					}
                     // Move container with swipe, restricting container from leaving the screen
 					var curLeft = gameModule.bottomScrollContainer.offsetLeft;
                     var newPosition = evt.deltaX + curLeft;
-                    if(newPosition > (window.screen.width * .5)) {
-                        newPosition = window.screen.width * .5;
+                    var screenMiddle = window.screen.width * .5;
+                    if(newPosition > screenMiddle) {
+                        newPosition =  screenMiddle;
                     }
-                    else if(newPosition < (0 - gameModule.bottomScrollContainer.offsetWidth) + (window.screen.width * .5)) {
-                        newPosition = (0 - gameModule.bottomScrollContainer.offsetWidth) + (window.screen.width * .5);
+                    else if(newPosition < screenMiddle - gameModule.bottomScrollContainer.offsetWidth) {
+                        newPosition = screenMiddle - gameModule.bottomScrollContainer.offsetWidth;
                     }
-                    
 					gameModule.bottomScrollContainer.style.left = newPosition + "px";
 				}, 
 				touchEnd: function(evt) {
 					lockBottomScroll();
 				}
 			});
+            lockBottomScroll();
 
 			// ————— ————— ————— ————— set up swipe event for main card
 			Transform(this.displayCard);
@@ -333,7 +329,7 @@ document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerTe
 			    // Either: Check to see if the card should add, 
 			    // OR: Put the card back into place
 			    touchEnd: function() {
-			    	// touchEnd is a funciton from Alloy. It's when your finger lifts 
+			    	// touchEnd is a function from Alloy. It's when your finger lifts 
 			    	var maxMove = 100;
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
@@ -360,7 +356,7 @@ document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerTe
 // init displayCard with random station
 // initialize bottomScrollContainer to be centered, specifically on selected station
 
-			gameModule.setupSwipeEvent();
+			gameModule.setupSwipeEvent();     
 		},
 		// ———— ———— animation flags:
 		animateMainCard: false,
@@ -394,6 +390,20 @@ document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerTe
 		    if (gameModule.animateBottomSlide) {
 		    	// Move until the selected station is in the middle
 		    	// this is where the bottom slide should lock in place
+                // FUTURE!
+                // animate scroll parent to that spot
+                // here's a non-animated fix 
+                // offset container to lock selected station in center of screen
+                var stationToLock = document.getElementsByClassName("selectedStation")[0];
+                if (stationToLock != null && stationToLock != undefined) {
+                    var screenMiddle = window.screen.width *.5;
+                    var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);
+                    gameModule.bottomScrollContainer.style.left = (screenMiddle - adjust) + "px";
+                }
+                // Check is for future scroll animation end
+                if(gameModule.bottomScrollContainer.style.left == ((screenMiddle - adjust) + "px")) {
+                    gameModule.animateBottomSlide = false;
+                }
 		    }
 			if (gameModule.animateMainCard || gameModule.animateBottomSlide) { 
 				// recursion. window.request... is a more performant animation function than setInterval

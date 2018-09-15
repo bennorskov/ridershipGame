@@ -148,21 +148,21 @@ var gameModule = (function () {
 		*/
 
 		// temp test code, comment out if things are workign:
-		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];
-		console.log(gameModule.currentStation);
+		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];		console.log(gameModule.currentStation);
 		// end test code
 
-		if (gameModule.currentStation === null) {
+		if (gameModule.currentStation === null || gameModule.currentStation === undefined) {
 			// if first station. There is nothing to compare, just add it!
-			console.log("current Station was null!");
+			console.log("current Station was null or undefined!");
+console.log("swipedStation!: " + swipedStation);
 			addToBottomScroll(swipedStation);
 			return; // ignore below and return void
 		}
 
 		// store ridership in "current" and "selected" then compare
-		current = dataSet.get(swipedStation).ridership;
+		var current = dataSet.get(swipedStation).ridership;
 		console.log(gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
-		selected = dataSet.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
+		var selected = dataSet.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
 		
 		/*
 		*	Future step! (Issue created on github)
@@ -198,12 +198,18 @@ var gameModule = (function () {
 		gameModule.displayCard.innerHTML = _html;
 	}
 	function addToBottomScroll( stationToAdd ) {
+// Here we go! 
+        // Initialize bottomScrollContainer by adding a random station at game start
+        if(stationToAdd == null || stationToAdd == undefined) {
+            stationToAdd = getRandomStationName();
+        }
 		console.log(stationToAdd + " Added to bottom!");
 
 		// "stationOrder" is the class name of the bottom bar. 
 		// we could improve performance by storing this in a variable like gameModule.displayCard
-		var statOrd = document.getElementsByClassName("stationOrder")[0];
-
+//		var statOrd = document.getElementsByClassName("stationOrder")[0];
+        gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
+        
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
@@ -216,11 +222,14 @@ var gameModule = (function () {
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		console.log("Temp is " + temp.innerHTML);
-		statOrd.appendChild(temp.content.firstChild);
+//		statOrd.appendChild(temp.content.firstChild);
+		gameModule.bottomScrollContainer.appendChild(temp.content.firstChild);
 		gameModule.currentStation = temp;
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
 		dataSet.delete(stationToAdd);
+        // lock the bottom scroll container, wherever appropriate
+        lockBottomScroll();
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
@@ -328,8 +337,9 @@ var gameModule = (function () {
 		},
 		init: function () {
 			setupDataObject();
-			gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
+            checkSwipeVsSelected();
+            gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.setupSwipeEvent();
 		},
 		// ———— ———— animation flags:

@@ -146,26 +146,23 @@ var gameModule = (function () {
 		*	swipedStation is a string
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
+		gameModule.selectedStation = document.getElementsByClassName("selectedStation")[0];		
 
-		// temp test code, comment out if things are workign:
-		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];		console.log('currentStation: ' + gameModule.currentStation);
-		// end test code
-
-		if (gameModule.currentStation === null || gameModule.currentStation === undefined) {
+/*
+		if (gameModule.selectedStation === null || gameModule.selectedStation === undefined) {
 			// if first station. There is nothing to compare, just add it!
 			console.log("current Station was null or undefined!");
 			addToBottomScroll( getRandomStationName() );
             changeDisplayCard( getRandomStationName() );
 			return; // ignore below and return void
 		}
-
+*/
 		// store ridership in "current" and "selected" then compare
-		var current = dataSet.get(swipedStation).ridership;
-		console.log(gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText );
-		var selected = displayedStations.get( gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
+		var card = dataSet.get(swipedStation).ridership;
+		var selected = displayedStations.get( gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
 		
         // more temporary test code to help with comparisons
-        console.log(current + ": " + swipedStation + "\n" + selected + ": " + gameModule.currentStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+        console.log(card + ": " + swipedStation + "\n" + selected + ": " + gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
         // end test code
         
 		/*
@@ -173,9 +170,9 @@ var gameModule = (function () {
 		* 	Need to check against all added stations
 		*	Right now, we're only checking against the selected station
 		*/
-		if (current > selected && direction > 0) { // bigger swipe (right)
+		if (card > selected && direction > 0) { // bigger swipe (right)
 			addToBottomScroll(swipedStation);
-		} else if (current < selected && direction < 0){ // smaller swipe (left)
+		} else if (card < selected && direction < 0){ // smaller swipe (left)
 			addToBottomScroll(swipedStation);
 		}
         else {  
@@ -192,15 +189,16 @@ var gameModule = (function () {
 	function changeDisplayCard(stationName) {
 		// change the displayCard that you swipe to test against selectedStation
         // If stationName is null, use a random station from data set
-        if(stationName === null || stationName === undefined) {
-            stationName = getRandomStationName();
-        }
+//        if(stationName === null || stationName === undefined) {
+//            stationName = getRandomStationName();
+//        }
         if(dataSet.size < 1) {
 // DATASET IS OUT OF STATIONS. WIN CONDITION???
 console.log('dataSet is empty! You Win!');            
         }
-
 		console.log("adding " + stationName + " card");
+        
+        gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
 		_html += "<div class='displayCard__lines'>";
@@ -215,20 +213,19 @@ console.log('dataSet is empty! You Win!');
 	}
 	function addToBottomScroll( stationToAdd ) {
         // Initialize bottomScrollContainer by adding a random station at game start
-        if(stationToAdd == null || stationToAdd == undefined) {
-            stationToAdd = getRandomStationName();
-        }
+//        if(stationToAdd == null || stationToAdd == undefined) {
+//            stationToAdd = getRandomStationName();
+//        }
 		console.log(stationToAdd + " Added to bottom!");
 
 		// "stationOrder" is the class name of the bottom bar. 
 		// we could improve performance by storing this in a variable like gameModule.displayCard
-//		var statOrd = document.getElementsByClassName("stationOrder")[0];
         gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
         
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
-		var _html = "<div class='stationOrder__station selectedStation " + className + "'>";
+		var _html = "<div class='stationOrder__station " + className + "'>";
 		_html += "<h1 class='stationOrder__station--label'>" + stationToAdd + "</h1>";
 		_html += "<h1 class='stationOrder__station--lineLabel'>"+ lineName.toUpperCase() +"</h1>";
 		_html += "</div>";
@@ -237,14 +234,9 @@ console.log('dataSet is empty! You Win!');
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		console.log("Temp is " + temp.innerHTML);
-//		statOrd.appendChild(temp.content.firstChild);
 		gameModule.bottomScrollContainer.appendChild(temp.content.firstChild);
-		gameModule.currentStation = temp;
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
-		dataSet.delete(stationToAdd);
-        // lock the bottom scroll container on appropriate station
-        lockBottomScroll();
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
@@ -262,9 +254,9 @@ console.log('dataSet is empty! You Win!');
 			// select it
 			for (let chi of bottomScrollChildren) {
 				var centerOfStation = chi.offsetLeft + (chi.offsetWidth*.5);
-                var difference = screenMiddle - (centerOfStation + bSLeft);
-				if (Math.abs(difference) < closestAmount) {
-					closestAmount = Math.abs(difference);
+                var difference = Math.abs(screenMiddle - (centerOfStation + bSLeft));
+				if (difference < closestAmount) {
+					closestAmount = difference;
 					stationToLock = chi;                    
 				}
 			}    
@@ -274,6 +266,7 @@ console.log('dataSet is empty! You Win!');
 		// select station by making it bigger and removing outline
 		stationToLock.classList.add("selectedStation");
 		console.log(stationToLock.children[0]);
+		gameModule.selectedStation = stationToLock;        
 		// set bottom text to station name
 		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
         // Animate scroll to lock selected station in the screen middle
@@ -289,7 +282,7 @@ console.log('dataSet is empty! You Win!');
 		},
 		displayCard: "",
 		bottomScrollContainer: "",
-		currentStation: null,
+		selectedStation: null,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
 			new AlloyFinger(this.bottomScrollContainer, {
@@ -299,8 +292,7 @@ console.log('dataSet is empty! You Win!');
 						selected.classList.remove("selectedStation");
                         document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
 // FUTURE?
-// change large label to be station currently closest to center?
-// Also, add inertia scrolling to swipes?                        
+// Add inertia scrolling to swipes?                        
 					}
                     // Move container with swipe, restricting container from leaving the screen
 					var curLeft = gameModule.bottomScrollContainer.offsetLeft;
@@ -318,7 +310,6 @@ console.log('dataSet is empty! You Win!');
 					lockBottomScroll();
 				}
 			});
-            lockBottomScroll();
 
 			// ————— ————— ————— ————— set up swipe event for main card
 			Transform(this.displayCard);
@@ -365,16 +356,17 @@ console.log('dataSet is empty! You Win!');
 			});
 		},
 		init: function () {
-// FUTURE! 
-// init stationOrder bar with 3 random stations
-// init displayCard with random station
-// initialize bottomScrollContainer to be centered, specifically on selected station            
 			setupDataObject();
-			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
-            gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
-			gameModule.setupSwipeEvent();
-            checkSwipeVsSelected();
+            // init stationOrder bar with 3 random stations            
+            addToBottomScroll( getRandomStationName() );
+            addToBottomScroll( getRandomStationName() );            
+            addToBottomScroll( getRandomStationName() );
+            lockBottomScroll();
 
+            // init displayCard with random station            
+            changeDisplayCard( getRandomStationName() );
+
+            gameModule.setupSwipeEvent();
 		},
 		// ———— ———— animation flags:
 		animateMainCard: false,

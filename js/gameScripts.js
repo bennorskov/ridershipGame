@@ -374,6 +374,7 @@ console.log('dataSet is empty! You Win!');
 		init: function () {
 			setupDataObject();
 			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
+<<<<<<< HEAD
 // FUTURE! 
 // init stationOrder bar with 3 random stations
 // init displayCard with random station

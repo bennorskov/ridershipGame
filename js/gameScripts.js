@@ -147,14 +147,8 @@ var gameModule = (function () {
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
 
-<<<<<<< HEAD
-		// temp test code, comment out if things are working:
-		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];
-		console.log(gameModule.currentStation);
-=======
 		// temp test code, comment out if things are workign:
 		gameModule.currentStation = document.getElementsByClassName("selectedStation")[0];		console.log('currentStation: ' + gameModule.currentStation);
->>>>>>> bug/start-state
 		// end test code
 
 		if (gameModule.currentStation === null || gameModule.currentStation === undefined) {
@@ -220,7 +214,6 @@ console.log('dataSet is empty! You Win!');
 		gameModule.displayCard.innerHTML = _html;
 	}
 	function addToBottomScroll( stationToAdd ) {
-// Here we go! 
         // Initialize bottomScrollContainer by adding a random station at game start
         if(stationToAdd == null || stationToAdd == undefined) {
             stationToAdd = getRandomStationName();
@@ -372,21 +365,16 @@ console.log('dataSet is empty! You Win!');
 			});
 		},
 		init: function () {
-			setupDataObject();
-			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
-<<<<<<< HEAD
 // FUTURE! 
 // init stationOrder bar with 3 random stations
 // init displayCard with random station
-// initialize bottomScrollContainer to be centered, specifically on selected station
-
-			gameModule.setupSwipeEvent();     
-=======
+// initialize bottomScrollContainer to be centered, specifically on selected station            
+			setupDataObject();
+			gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
             gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
 			gameModule.setupSwipeEvent();
             checkSwipeVsSelected();
 
->>>>>>> bug/start-state
 		},
 		// ———— ———— animation flags:
 		animateMainCard: false,

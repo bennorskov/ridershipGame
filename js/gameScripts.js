@@ -237,7 +237,7 @@ console.log('dataSet is empty! You Win!');
 		gameModule.bottomScrollContainer.appendChild(temp.content.firstChild);
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
-dataSet.delete(stationToAdd);        
+        dataSet.delete(stationToAdd);        
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
@@ -411,7 +411,7 @@ dataSet.delete(stationToAdd);
                     var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);
                     gameModule.bottomScrollContainer.style.left = (screenMiddle - adjust) + "px";
                 }
-                // Check is for future scroll animation end
+                // End scroll animation (for future use)
                 if(gameModule.bottomScrollContainer.style.left == ((screenMiddle - adjust) + "px")) {
                     gameModule.animateBottomSlide = false;
                 }

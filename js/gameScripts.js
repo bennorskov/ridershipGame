@@ -237,6 +237,7 @@ console.log('dataSet is empty! You Win!');
 		gameModule.bottomScrollContainer.appendChild(temp.content.firstChild);
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
+dataSet.delete(stationToAdd);        
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null

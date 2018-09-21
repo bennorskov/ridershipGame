@@ -212,7 +212,7 @@ console.log('dataSet is empty! You Win!');
 		gameModule.displayCard.innerHTML = _html;
 	}
 	function addToBottomScroll( stationToAdd ) {
-        // Initialize bottomScrollContainer by adding a random station at game start
+        // Initialize stationOrd by adding a random station at game start
 //        if(stationToAdd == null || stationToAdd == undefined) {
 //            stationToAdd = getRandomStationName();
 //        }
@@ -220,7 +220,7 @@ console.log('dataSet is empty! You Win!');
 
 		// "stationOrder" is the class name of the bottom bar. 
 		// we could improve performance by storing this in a variable like gameModule.displayCard
-        gameModule.bottomScrollContainer = document.getElementsByClassName("stationOrder")[0];
+        gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
         
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
@@ -234,7 +234,7 @@ console.log('dataSet is empty! You Win!');
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		console.log("Temp is " + temp.innerHTML);
-		gameModule.bottomScrollContainer.appendChild(temp.content.firstChild);
+		gameModule.stationOrd.appendChild(temp.content.firstChild);
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
         dataSet.delete(stationToAdd);        
@@ -242,9 +242,10 @@ console.log('dataSet is empty! You Win!');
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
 		// eventually we should click on a station and it'll scroll to it
-		var bottomScrollChildren = gameModule.bottomScrollContainer.children;
-		var bSLeft = gameModule.bottomScrollContainer.offsetLeft;
-		var bSWidth = gameModule.bottomScrollContainer.offsetWidth;
+        gameModule.stationOrd = document.getElementsByClassName('stationOrder')[0];        
+		var stationOrdChildren = gameModule.stationOrd.children;
+		var bSLeft = gameModule.stationOrd.offsetLeft;
+		var bSWidth = gameModule.stationOrd.offsetWidth;
 		var screenMiddle = window.screen.width * .5;
 		
         // if a swipe, then stationToLock will be null, so we have to find the most middle station
@@ -253,7 +254,7 @@ console.log('dataSet is empty! You Win!');
 			var closestAmount = screenMiddle;
 			// cycle through children until you find the closest child to the center. 
 			// select it
-			for (let chi of bottomScrollChildren) {
+			for (let chi of stationOrdChildren) {
 				var centerOfStation = chi.offsetLeft + (chi.offsetWidth*.5);
                 var difference = Math.abs(screenMiddle - (centerOfStation + bSLeft));
 				if (difference < closestAmount) {
@@ -282,10 +283,13 @@ console.log('dataSet is empty! You Win!');
 			return dataSet;
 		},
 		displayCard: "",
-		bottomScrollContainer: "",
+		stationOrd: "",
+        bottomScrollContainer: "",
 		selectedStation: null,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
+            gameModule.bottomScrollContainer = document.getElementsByClassName('bsc')[0];           
+
 			new AlloyFinger(this.bottomScrollContainer, {
 				pressMove: function(evt) {
 					var selected = document.getElementsByClassName("selectedStation")[0] || null;
@@ -295,17 +299,17 @@ console.log('dataSet is empty! You Win!');
 // FUTURE?
 // Add inertia scrolling to swipes?                        
 					}
-                    // Move container with swipe, restricting container from leaving the screen
-					var curLeft = gameModule.bottomScrollContainer.offsetLeft;
+                    // Move stations with swipe, restricting stations from leaving the screen
+					var curLeft = gameModule.stationOrd.offsetLeft;
                     var newPosition = evt.deltaX + curLeft;
                     var screenMiddle = window.screen.width * .5;
                     if(newPosition > screenMiddle) {
                         newPosition =  screenMiddle;
                     }
-                    else if(newPosition < screenMiddle - gameModule.bottomScrollContainer.offsetWidth) {
-                        newPosition = screenMiddle - gameModule.bottomScrollContainer.offsetWidth;
+                    else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
+                        newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
                     }
-					gameModule.bottomScrollContainer.style.left = newPosition + "px";
+					gameModule.stationOrd.style.left = newPosition + "px";
 				}, 
 				touchEnd: function(evt) {
 					lockBottomScroll();
@@ -409,10 +413,10 @@ console.log('dataSet is empty! You Win!');
                 if (stationToLock != null && stationToLock != undefined) {
                     var screenMiddle = window.screen.width *.5;
                     var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);
-                    gameModule.bottomScrollContainer.style.left = (screenMiddle - adjust) + "px";
+                    gameModule.stationOrd.style.left = (screenMiddle - adjust) + "px";
                 }
                 // End scroll animation (for future use)
-                if(gameModule.bottomScrollContainer.style.left == ((screenMiddle - adjust) + "px")) {
+                if(gameModule.stationOrd.style.left == ((screenMiddle - adjust) + "px")) {
                     gameModule.animateBottomSlide = false;
                 }
 		    }

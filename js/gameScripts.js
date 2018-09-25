@@ -149,7 +149,6 @@ var start = true;
 		*	swipedStation is a string
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
-		gameModule.selectedStation = document.getElementsByClassName("selectedStation")[0];		
 
 /*
 		if (gameModule.selectedStation === null || gameModule.selectedStation === undefined) {
@@ -159,13 +158,17 @@ var start = true;
             changeDisplayCard( getRandomStationName() );
 			return; // ignore below and return void
 		}
-*/
-        // If swiped station is GAME OVER card, restart game
-        if(swipedStation == "Game Over!") {
+*/      
+        if(swipedStation == "Swipe to Begin") {
+            changeDisplayCard(getRandomStationName());
+            return;
+        } else if(swipedStation == "Game Over") {
+            gameModule.init()
+            return;
+        } else if(swipedStation == "You Win") {
             gameModule.init();
             return;
-        }
-        
+        }      
         
 		// store ridership in "current" and "selected" then compare
 		var card = dataSet.get(swipedStation).ridership;
@@ -184,9 +187,14 @@ var start = true;
 			addToBottomScroll(swipedStation);
 		} else if (card < selected && direction < 0){ // smaller swipe (left)
 			addToBottomScroll(swipedStation);
-		}
-        else {  
+		} else {  
             displayEndScreen();
+            return;
+        }
+        if(dataSet.size < 1) {
+            // DATASET IS OUT OF STATIONS. WIN CONDITION!
+            console.log('dataSet is empty! You Win!');
+            displayWinScreen();
             return;
         }
 		changeDisplayCard( getRandomStationName() );
@@ -203,14 +211,8 @@ var start = true;
 //        if(stationName === null || stationName === undefined) {
 //            stationName = getRandomStationName();
 //        }
-        if(dataSet.size < 1) {
-// DATASET IS OUT OF STATIONS. WIN CONDITION???
-console.log('dataSet is empty! You Win!');            
-        }
 		console.log("adding " + stationName + " card");
         
-        gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
-
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
 		_html += "<div class='displayCard__lines'>";
 
@@ -223,14 +225,7 @@ console.log('dataSet is empty! You Win!');
 		gameModule.displayCard.innerHTML = _html;
 	}
 	function addToBottomScroll( stationToAdd ) {
-        // Initialize stationOrd by adding a random station at game start
-//        if(stationToAdd == null || stationToAdd == undefined) {
-//            stationToAdd = getRandomStationName();
-//        }
 		console.log(stationToAdd + " Added to bottom!");
-
-		// "stationOrder" is the class name of the bottom bar. 
-        gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
         
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
@@ -251,7 +246,6 @@ console.log('dataSet is empty! You Win!');
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
 		// eventually we should click on a station and it'll scroll to it
-//        gameModule.stationOrd = document.getElementsByClassName('stationOrder')[0];        
 		var stationOrdChildren = gameModule.stationOrd.children;
 		var bSLeft = gameModule.stationOrd.offsetLeft;
 		var bSWidth = gameModule.stationOrd.offsetWidth;
@@ -284,27 +278,52 @@ console.log('dataSet is empty! You Win!');
         gameModule.animateBottomSlide = true;
         gameModule.animate();
 	}
+    function displayStartScreen () {
+        gameModule.animateMainCard = false;
+        gameModule.animateBottomSlide = false;
+        gameModule.displayCard.innerHTML = "";
+
+        // Display instructions
+        // it's less hacky to create a temporary dom element than use a hidden one
+        let _html = "<hr><h1 class='displayCard__title'>Swipe to Begin</h1><br>";
+        _html += "<h3><- Swipe this sign to the left if the station on it is less busy than station selected at bottom. <br>-> Swipe sign right if it is busier than selected station.</h3><br>";
+        _html += "<h3>Swipe bottom of screen to select a different station.</h3>";
+		var temp = document.createElement("template");
+		temp.innerHTML = _html.trim(); // remove extra whitespace
+		gameModule.displayCard.appendChild(temp.content);
+    }
     function displayEndScreen () {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
         gameModule.animateMainCard = false;
         gameModule.animateBottomSlide = false;
-console.log("Game Over, dude!")      
+        console.log("Game Over, dude!");     
         
-        let cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
-        let cardRiders = dataSet.get(cardName).ridership;
-        
-        let selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
-		let selectedRiders = displayedStations.get(selectedName).ridership;
-                
+//        let cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
+//        let selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
+//        let cardRiders = dataSet.get(cardName).ridership;
+//		  let selectedRiders = displayedStations.get(selectedName).ridership;
+               
         gameModule.displayCard.innerHTML = "";
-        gameModule.stationOrd.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
-        let _html = "<hr><h1 class='displayCard__title'>Game Over!</h1>";
+        let _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><h3>Swipe sign to play again.</h3>";
 		var temp = document.createElement("template");
-		temp.innerHTML = _html.trim(); // remove extra whitespace
+		temp.innerHTML = _html.trim(); 
 		gameModule.displayCard.appendChild(temp.content);
-        
+    }
+    function displayWinScreen () {
+        // This function is called by checkSwipeVsSelected when dataSet runs out of stations.
+        gameModule.animateMainCard = false;
+        gameModule.animateBottomSlide = false;
+        console.log("Winner, winner, chicken dinner!");      
+    
+        gameModule.displayCard.innerHTML = "";
+
+        // it's less hacky to create a temporary dom element than use a hidden one
+        let _html = "<hr><h1 class='displayCard__title'>You Win</h1><br><h3>Swipe sign to play again.</h3>";
+		var temp = document.createElement("template");
+		temp.innerHTML = _html.trim(); 
+		gameModule.displayCard.appendChild(temp.content);    
     }
 
 	// ——————— ——————— public methods below
@@ -319,12 +338,10 @@ console.log("Game Over, dude!")
 		selectedStation: null,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
-            gameModule.bottomScrollContainer = document.getElementsByClassName('bsc')[0];           
-
 			new AlloyFinger(this.bottomScrollContainer, {
 				pressMove: function(evt) {
 					var selected = document.getElementsByClassName("selectedStation")[0] || null;
-					if (selected != null) {
+                    if (selected != null) {
 						selected.classList.remove("selectedStation");
                         document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
 					}
@@ -390,17 +407,29 @@ console.log("Game Over, dude!")
 			});
 		},
 		init: function () {
-			setupDataObject();
+            animateMainCard = false;
+            animateBottomSlide = false;
             
-            // init stationOrder bar with 3 random stations            
+            // Initialize game object properties to doc elements
+            gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
+            gameModule.bottomScrollContainer = document.getElementsByClassName('bsc')[0];
+            gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
+
+            // Clear any existing elements to start fresh
+            gameModule.stationOrd.innerHTML = "";
+            gameModule.stationOrd.style.left = "0px";
+            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
+            
+            setupDataObject();
+            
+            // init stationOrder bar with 3 random stations  
             addToBottomScroll( getRandomStationName() );
             addToBottomScroll( getRandomStationName() );            
             addToBottomScroll( getRandomStationName() );
             lockBottomScroll();
 
-            // init displayCard with random station            
-            changeDisplayCard( getRandomStationName() );
-
+            displayStartScreen();
+            
             if(start) {
                 start = false;
                 gameModule.setupSwipeEvent();
@@ -442,7 +471,7 @@ console.log("Game Over, dude!")
 
                 // here's a non-animated fix 
                 // offset container to lock selected station in center of screen
-                var stationToLock = document.getElementsByClassName("selectedStation")[0];
+                var stationToLock = gameModule.selectedStation;
                 if (stationToLock != null && stationToLock != undefined) {
                     var screenMiddle = window.screen.width *.5;
                     var adjust = stationToLock.offsetLeft + (stationToLock.offsetWidth * .5);

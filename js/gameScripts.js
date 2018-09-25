@@ -17,6 +17,7 @@
 var timeout = null;
 var gameModule = (function () {
 	// As the game progresses, move stations into displayedStations and delete from dataSet
+var start = true;    
 	var dataSet = new Map();
 	var displayedStations = new Map();
 	function setupDataObject() {
@@ -31,6 +32,8 @@ var gameModule = (function () {
 		*	That way, we can just call any data from a station using its name
 		*	(The downside is that it's rather easy to mistype/spell station names, so watch for that)
 		*/
+        dataSet = new Map();
+        displayedStations = new Map();
 
 		dataSet.set( 
 			"14th St-Union Square", {
@@ -157,6 +160,13 @@ var gameModule = (function () {
 			return; // ignore below and return void
 		}
 */
+        // If swiped station is GAME OVER card, restart game
+        if(swipedStation == "Game Over!") {
+            gameModule.init();
+            return;
+        }
+        
+        
 		// store ridership in "current" and "selected" then compare
 		var card = dataSet.get(swipedStation).ridership;
 		var selected = displayedStations.get( gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
@@ -176,7 +186,8 @@ var gameModule = (function () {
 			addToBottomScroll(swipedStation);
 		}
         else {  
-             console.log("Game Over!")
+            displayEndScreen();
+            return;
         }
 		changeDisplayCard( getRandomStationName() );
 	}
@@ -219,7 +230,6 @@ console.log('dataSet is empty! You Win!');
 		console.log(stationToAdd + " Added to bottom!");
 
 		// "stationOrder" is the class name of the bottom bar. 
-		// we could improve performance by storing this in a variable like gameModule.displayCard
         gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
         
 		// grab a random line from the station to use as the display station for the botton bar:
@@ -233,7 +243,6 @@ console.log('dataSet is empty! You Win!');
 		// it's less hacky to create a temporary dom element than use a hidden one
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
-		console.log("Temp is " + temp.innerHTML);
 		gameModule.stationOrd.appendChild(temp.content.firstChild);
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
@@ -242,7 +251,7 @@ console.log('dataSet is empty! You Win!');
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
 		// eventually we should click on a station and it'll scroll to it
-        gameModule.stationOrd = document.getElementsByClassName('stationOrder')[0];        
+//        gameModule.stationOrd = document.getElementsByClassName('stationOrder')[0];        
 		var stationOrdChildren = gameModule.stationOrd.children;
 		var bSLeft = gameModule.stationOrd.offsetLeft;
 		var bSWidth = gameModule.stationOrd.offsetWidth;
@@ -275,6 +284,28 @@ console.log('dataSet is empty! You Win!');
         gameModule.animateBottomSlide = true;
         gameModule.animate();
 	}
+    function displayEndScreen () {
+        // This function is called by checkSwipeVsSelected when player answers incorrectly.
+        gameModule.animateMainCard = false;
+        gameModule.animateBottomSlide = false;
+console.log("Game Over, dude!")      
+        
+        let cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
+        let cardRiders = dataSet.get(cardName).ridership;
+        
+        let selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
+		let selectedRiders = displayedStations.get(selectedName).ridership;
+                
+        gameModule.displayCard.innerHTML = "";
+        gameModule.stationOrd.innerHTML = "";
+
+        // it's less hacky to create a temporary dom element than use a hidden one
+        let _html = "<hr><h1 class='displayCard__title'>Game Over!</h1>";
+		var temp = document.createElement("template");
+		temp.innerHTML = _html.trim(); // remove extra whitespace
+		gameModule.displayCard.appendChild(temp.content);
+        
+    }
 
 	// ——————— ——————— public methods below
 	return {
@@ -296,8 +327,6 @@ console.log('dataSet is empty! You Win!');
 					if (selected != null) {
 						selected.classList.remove("selectedStation");
                         document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-// FUTURE?
-// Add inertia scrolling to swipes?                        
 					}
                     // Move stations with swipe, restricting stations from leaving the screen
 					var curLeft = gameModule.stationOrd.offsetLeft;
@@ -362,6 +391,7 @@ console.log('dataSet is empty! You Win!');
 		},
 		init: function () {
 			setupDataObject();
+            
             // init stationOrder bar with 3 random stations            
             addToBottomScroll( getRandomStationName() );
             addToBottomScroll( getRandomStationName() );            
@@ -371,7 +401,10 @@ console.log('dataSet is empty! You Win!');
             // init displayCard with random station            
             changeDisplayCard( getRandomStationName() );
 
-            gameModule.setupSwipeEvent();
+            if(start) {
+                start = false;
+                gameModule.setupSwipeEvent();
+            }
 		},
 		// ———— ———— animation flags:
 		animateMainCard: false,
@@ -404,9 +437,9 @@ console.log('dataSet is empty! You Win!');
 		    }
 		    if (gameModule.animateBottomSlide) {
 		    	// Move until the selected station is in the middle
-		    	// this is where the bottom slide should lock in place
                 // FUTURE!
-                // animate scroll parent to that spot
+                // animate scroll parent to that spot. Add inertia scrolling to swipes?  
+
                 // here's a non-animated fix 
                 // offset container to lock selected station in center of screen
                 var stationToLock = document.getElementsByClassName("selectedStation")[0];

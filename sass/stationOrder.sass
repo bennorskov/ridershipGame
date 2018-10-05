@@ -1,5 +1,10 @@
 $stationWidth: 13vw
 $stationMargin: $stationWidth/2 + 1
+.bottomScrollContainer
+	position: fixed
+	width: 100vw
+	height: 50vh
+	top: 65vh
 .stationOrder
 	text-align: center
 	position: fixed
@@ -31,7 +36,7 @@ $stationMargin: $stationWidth/2 + 1
 			width: 15vh
 			transform: rotate(-65deg)
 			position: absolute
-			text-align: center
+			text-align: left
 			color: #b3b3b3
 		&.selectedStation
 			border-radius: $stationMargin + 4

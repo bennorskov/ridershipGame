@@ -32,6 +32,12 @@ body {
       color: white;
       display: inline-block; }
 
+.bottomScrollContainer {
+  position: fixed;
+  width: 100vw;
+  height: 50vh;
+  top: 65vh; }
+
 .stationOrder {
   text-align: center;
   position: fixed;
@@ -63,7 +69,7 @@ body {
       width: 15vh;
       transform: rotate(-65deg);
       position: absolute;
-      text-align: center;
+      text-align: left;
       color: #b3b3b3; }
     .stationOrder__station.selectedStation {
       border-radius: 11.5vw;

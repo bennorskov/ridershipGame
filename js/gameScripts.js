@@ -14,7 +14,6 @@
 *
 */
 
-var timeout = null;
 var gameModule = (function () {
 	// As the game progresses, move stations into displayedStations and delete from dataSet
     var start = true;  // There's probably a better way to do this.    
@@ -360,7 +359,6 @@ var gameModule = (function () {
 			Transform(this.displayCard);
 			new AlloyFinger(this.displayCard, {
 			    pressMove:function(evt){
-			    	if (timeout != null) clearInterval(timeout);
 			    	var maxMove = 100;
 			    	// var limit = Math.min(evt.deltaX
 			    	if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMove) {
@@ -406,7 +404,7 @@ var gameModule = (function () {
             
             // Initialize game object properties to doc elements
             gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
-            gameModule.bottomScrollContainer = document.getElementsByClassName('bsc')[0];
+            gameModule.bottomScrollContainer = document.getElementsByClassName('bottomScrollContainer')[0];
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear any existing elements to start fresh

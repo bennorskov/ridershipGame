@@ -400,6 +400,7 @@ lockBottomScroll();
 			});
 		},
 		init: function () {
+// TESTTSST            
             // Reset game state variables
             gameModule.animateMainCard = false;
             gameModule.animateBottomSlide = false;

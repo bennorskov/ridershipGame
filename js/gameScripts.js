@@ -199,10 +199,6 @@ var gameModule = (function () {
 	}
 	function changeDisplayCard(stationName) {
 		// change the displayCard that you swipe to test against selectedStation
-        // If stationName is null, use a random station from data set
-//        if(stationName === null || stationName === undefined) {
-//            stationName = getRandomStationName();
-//        }
 		console.log("adding " + stationName + " card");
         
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
@@ -210,7 +206,7 @@ var gameModule = (function () {
 
 		// add line circles to main card
 		var lines = dataSet.get(stationName).lines;
-		for (var i = lines.length - 1; i >= 0; i--) {
+		for (let i = 0; i < lines.length; i++) {
 			_html += addLineToDisplayCard(lines[i]) + " ";
 		};
 		_html += "</div>";
@@ -415,8 +411,6 @@ var gameModule = (function () {
             setupDataObject();
             
             // init stationOrder bar with 3 random stations  
-            addToBottomScroll( getRandomStationName() );
-            addToBottomScroll( getRandomStationName() );            
             addToBottomScroll( getRandomStationName() );
             lockBottomScroll();
 

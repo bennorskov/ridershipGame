@@ -152,6 +152,10 @@ var gameModule = (function () {
         if(swipedStation == "Swipe to Begin") {
             changeDisplayCard(getRandomStationName());
             return;
+        } else if(gameModule.selectedStation == null) {
+			addToBottomScroll(swipedStation);
+            changeDisplayCard( getRandomStationName() );
+            return;    
         } else if(swipedStation == "Game Over") {
             gameModule.init()
             return;
@@ -206,7 +210,7 @@ var gameModule = (function () {
 
 		// add line circles to main card
 		var lines = dataSet.get(stationName).lines;
-		for (let i = 0; i < lines.length; i++) {
+		for (var i = 0; i < lines.length; i++) {
 			_html += addLineToDisplayCard(lines[i]) + " ";
 		};
 		_html += "</div>";
@@ -230,7 +234,8 @@ var gameModule = (function () {
 		gameModule.stationOrd.appendChild(temp.content.firstChild);
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
-        dataSet.delete(stationToAdd);        
+        dataSet.delete(stationToAdd);  
+lockBottomScroll();
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
@@ -395,8 +400,9 @@ var gameModule = (function () {
 			});
 		},
 		init: function () {
-            animateMainCard = false;
-            animateBottomSlide = false;
+            // Reset game state variables
+            gameModule.animateMainCard = false;
+            gameModule.animateBottomSlide = false;
             
             // Initialize game object properties to doc elements
             gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
@@ -404,16 +410,13 @@ var gameModule = (function () {
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear any existing elements to start fresh
+            gameModule.selectedStation = null;
             gameModule.stationOrd.innerHTML = "";
             gameModule.stationOrd.style.left = "0px";
             document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
             
             setupDataObject();
             
-            // init stationOrder bar with 3 random stations  
-            addToBottomScroll( getRandomStationName() );
-            lockBottomScroll();
-
             displayStartScreen();
             
             // There's probably a better way to do this.

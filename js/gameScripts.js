@@ -231,11 +231,38 @@ var gameModule = (function () {
 		// it's less hacky to create a temporary dom element than use a hidden one
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
-		gameModule.stationOrd.appendChild(temp.content.firstChild);
+                
+        // Insert stationToAdd into stationOrder in correct ranking of ridership
+        if(gameModule.selectedStation == null) {
+            gameModule.stationOrd.appendChild(temp.content.firstChild);
+        }
+        else {
+            var added = false;
+            var stationOrdChildren = gameModule.stationOrd.children;  
+            // Cycle through stationOrd to find correct rank
+            for (let chi of stationOrdChildren) {
+                var chiName = chi.getElementsByClassName("stationOrder__station--label")[0].innerText;
+
+                var addRiders = dataSet.get(stationToAdd).ridership;
+                var chiRiders = displayedStations.get(chiName).ridership;
+console.log("chiName: " + chiName);
+console.log("chiRiders: " + chiRiders);
+                
+                if (addRiders < chiRiders) {
+                    gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
+                    added = true;
+                    break;
+                }
+            }
+            if(added == false) {
+                gameModule.stationOrd.appendChild(temp.content.firstChild);
+            } 
+        }
+        
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
         dataSet.delete(stationToAdd);  
-lockBottomScroll();
+        lockBottomScroll(gameModule.selectedStation);
 	}
 	function lockBottomScroll ( stationToLock ) {
 		// stationToLock is a dom element or null
@@ -400,7 +427,6 @@ lockBottomScroll();
 			});
 		},
 		init: function () {
-// TESTTSST            
             // Reset game state variables
             gameModule.animateMainCard = false;
             gameModule.animateBottomSlide = false;

@@ -13,7 +13,7 @@ body {
 
 .displayCard {
   width: 70vw;
-  margin: 10vh auto;
+  margin: 5vh auto;
   background: black;
   color: white;
   padding: 2em;
@@ -41,14 +41,13 @@ body {
 
 .bottomScrollContainer {
   width: 100vw;
-  height: 50vh;
-  top: 65vh;
+  height: 100vh;
 }
 
 .stationOrder {
   text-align: center;
   position: fixed;
-  bottom: 13vh;
+  bottom: 15vh;
   height: 13vw;
   overflow: visible;
   white-space: nowrap;

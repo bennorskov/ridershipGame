@@ -149,7 +149,7 @@ var gameModule = (function () {
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
       
-        if(swipedStation == "Swipe to Begin") {
+        if(swipedStation == "Swipe to Play") {
             changeDisplayCard(getRandomStationName());
             return;
         } else if(gameModule.selectedStation == null) {
@@ -306,7 +306,7 @@ console.log("chiRiders: " + chiRiders);
 
         // Display instructions
         // it's less hacky to create a temporary dom element than use a hidden one
-        var _html = "<hr><h1 class='displayCard__title'>Swipe to Begin</h1><br>";
+        var _html = "<hr><h1 class='displayCard__title'>Swipe to Play</h1><br>";
         _html += "<h3><- Swipe this sign to the left if the station on it is less busy than station selected at bottom. <br>-> Swipe sign right if it is busier than selected station.</h3><br>";
         _html += "<h3>Swipe bottom of screen to select a different station.</h3>";
 		var temp = document.createElement("template");
@@ -327,7 +327,7 @@ console.log("chiRiders: " + chiRiders);
         gameModule.displayCard.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
-        var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><h3>Swipe sign to play again.</h3>";
+        var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><h3>Swipe to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
 		gameModule.displayCard.appendChild(temp.content);
@@ -341,7 +341,7 @@ console.log("chiRiders: " + chiRiders);
         gameModule.displayCard.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
-        var _html = "<hr><h1 class='displayCard__title'>You Win</h1><br><h3>Swipe sign to play again.</h3>";
+        var _html = "<hr><h1 class='displayCard__title'>You Win</h1><br><h3>Swipe to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
 		gameModule.displayCard.appendChild(temp.content);    

@@ -41,7 +41,8 @@ body {
 
 .bottomScrollContainer {
   width: 100vw;
-  height: 50vh;
+  height: 80vh;
+  overflow: hidden;
 }
 
 .stationOrder {

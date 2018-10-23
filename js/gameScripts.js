@@ -359,28 +359,84 @@ console.log("chiRiders: " + chiRiders);
 		selectedStation: null,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
+//			Transform(this.bottomScrollContainer);
 			new AlloyFinger(this.bottomScrollContainer, {
+                touchStart: function(evt) { 
+console.log("touchStart!");  
+console.log("evt: "  + evt.touches[0].pageX);
+                    // Get x location of finger press to use in tap events
+                    gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
+                    gameModule.bottomScrollContainer.translateX = 0;
+                    evt.preventDefault();
+                },
 				pressMove: function(evt) {
+console.log("pressMove!");
+                    var screenMiddle = window.screen.width * .5;
+                    var curLeft = gameModule.stationOrd.offsetLeft;
+                    var newPosition = evt.deltaX + curLeft;
+                    gameModule.bottomScrollContainer.translateX += Math.abs(evt.deltaX);
+                    evt.preventDefault();
+
+                    // If there is a station selected, unselect it while scrolling
 					var selected = document.getElementsByClassName("selectedStation")[0] || null;
                     if (selected != null) {
 						selected.classList.remove("selectedStation");
                         document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
 					}
-                    // Move stations with swipe, restricting stations from leaving the screen
-					var curLeft = gameModule.stationOrd.offsetLeft;
-                    var newPosition = evt.deltaX + curLeft;
-                    var screenMiddle = window.screen.width * .5;
+                    // Move stations, restricting them from leaving the screen entirely
                     if(newPosition > screenMiddle) {
-                        newPosition =  screenMiddle;
+                        newPosition = screenMiddle;
                     }
                     else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
                         newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
                     }
-					gameModule.stationOrd.style.left = newPosition + "px";
+                    gameModule.stationOrd.style.left = newPosition + "px";
 				}, 
-				touchEnd: function(evt) {
-					lockBottomScroll();
-				}
+				touchEnd: function() {
+console.log("End!");
+                    // Check for tap
+                    if(gameModule.bottomScrollContainer.translateX == 0) {
+                        
+                    }
+                    lockBottomScroll();
+				},
+                // This function could happen inside touchEnd, which may be more efficient....
+                tap: function() {
+console.log("Tap!");
+                    var screenWidth = window.screen.width;
+                    var screenMiddle = screenWidth * .5;
+                    var curLeft = gameModule.stationOrd.offsetLeft;
+                    var delta = 0;
+                    
+                    if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .34) {
+                        delta = screenWidth * .25;
+                    }
+                    else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .67) {
+                        delta = screenWidth * -.25;
+                    }
+                    
+                    var newPosition = curLeft + delta;
+console.log("curLeft: "  + curLeft);  
+console.log("change: "  + delta);  
+console.log("newPosition: "  + newPosition);
+                    // If there is a station selected, unselect it
+					var selected = document.getElementsByClassName("selectedStation")[0] || null;
+                    if (selected != null) {
+						selected.classList.remove("selectedStation");
+                        document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
+					}
+                    // Move stations, restricting them from leaving the screen entirely
+                    if(newPosition > screenMiddle) {
+                        newPosition = screenMiddle;
+                    }
+                    else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
+                        newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
+                    }
+console.log("final: "  + newPosition);
+                    gameModule.stationOrd.style.left = newPosition + "px";
+                    
+                    lockBottomScroll();
+                }
 			});
 
 			// ————— ————— ————— ————— set up swipe event for main card
@@ -388,12 +444,13 @@ console.log("chiRiders: " + chiRiders);
 			new AlloyFinger(this.displayCard, {
 			    pressMove:function(evt){
 			    	var maxMove = 100;
-			    	// var limit = Math.min(evt.deltaX
-			    	if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMove) {
+                    if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMove) {
 			        	gameModule.displayCard.translateX += evt.deltaX;
 			        } else {
-			        	if (gameModule.displayCard.translateX < 0) gameModule.displayCard.translateX = -maxMove;
-			        	if (gameModule.displayCard.translateX > 0) gameModule.displayCard.translateX = maxMove;
+			        	if (gameModule.displayCard.translateX < 0) 
+                            gameModule.displayCard.translateX = -maxMove;
+			        	if (gameModule.displayCard.translateX > 0) 
+                            gameModule.displayCard.translateX = maxMove;
 			        }
 			        evt.preventDefault();
 
@@ -414,15 +471,14 @@ console.log("chiRiders: " + chiRiders);
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
 
 			    	// did you swipe long enough to check the card?
-			    	if (gameModule.displayCard.translateX/maxMove > completePercentage) {
+			    	if (percentageOfMove > completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    	} else if (gameModule.displayCard.translateX/maxMove < -completePercentage) {
+			    	} else if (percentageOfMove < -completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
 			    	}
 
 			    	gameModule.animateMainCard = true;
 			    	gameModule.animate();
-		    		
 			    }
 			});
 		},

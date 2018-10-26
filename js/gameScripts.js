@@ -19,6 +19,36 @@ var gameModule = (function () {
     var start = true;  // There's probably a better way to do this.    
 	var dataSet = new Map();
 	var displayedStations = new Map();
+    var afBottom;
+    var afDisplay;
+    var onTapBSC = function() {
+        // Skip function if animation already underway
+        if (gameModule.animateBottomScroll == true) { return; }
+        var screenWidth = window.screen.width;
+        var selected = document.getElementsByClassName("selectedStation")[0] || null;
+        var stationToLock = null;
+        if (selected != null) {
+            // Select left station
+            if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .3) {
+                stationToLock = selected.previousElementSibling;
+            }
+            // Select right station
+            else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .7) {
+                stationToLock = selected.nextElementSibling;
+            }
+            else { stationToLock = selected; }
+            // Remove previous selection and lock on new selection    
+            if(stationToLock != null) {            
+                selected.classList.remove("selectedStation");
+                document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
+
+                // Lock on newly selected station
+                lockBottomScroll(stationToLock, true);
+            }
+        }
+
+        console.log("--tap:\n" + parseInt(gameModule.bottomScrollContainer.touchStartX / (screenWidth/3)));
+    };
 	function setupDataObject() {
 		/*
 		*	Syntaxt for acessing data:
@@ -155,6 +185,7 @@ var gameModule = (function () {
         } else if(gameModule.selectedStation == null) {
 			addToBottomScroll(swipedStation);
             changeDisplayCard( getRandomStationName() );
+//            afBottom.on('tap', onTapBSC);
             return;    
         } else if(swipedStation == "Game Over") {
             gameModule.init()
@@ -262,11 +293,14 @@ var gameModule = (function () {
         console.log("addToBottomScroll:\n--" + stationToAdd);
 	}
 	function lockBottomScroll ( stationToLock=null, animate=false ) {
+        // Skip function if animation already underway
+        if (gameModule.animateBottomScroll == true) { return; }
+        // Skip function if stationOrd is empty
+        var stationOrdChildren = gameModule.stationOrd.children;
+        if (stationOrdChildren.length < 1) {return;}
 		// stationToLock is a dom element or null
-		var stationOrdChildren = gameModule.stationOrd.children;
-		var bSLeft = gameModule.stationOrd.offsetLeft;
-		var bSWidth = gameModule.stationOrd.offsetWidth;
-		var screenMiddle = window.screen.width * .5;
+        var screenMiddle = window.screen.width * .5;
+		var sOLeft = gameModule.stationOrd.offsetLeft;
 		
         // if a swipe, then stationToLock will be null, so we have to find the most middle station
 		if (stationToLock == null || stationToLock == undefined) {
@@ -276,36 +310,38 @@ var gameModule = (function () {
 			// select it
 			for (let chi of stationOrdChildren) {
 				var centerOfStation = chi.offsetLeft + (chi.offsetWidth*.5);
-                var difference = Math.abs(screenMiddle - (centerOfStation + bSLeft));
+                var difference = Math.abs(screenMiddle - (centerOfStation + sOLeft));
 				if (difference < closestAmount) {
 					closestAmount = difference;
 					stationToLock = chi;                    
 				}
 			}    
-		} else {
-            // if you tapped on a station, stationToLock should already be set
-            // if station already selected, do nothing
-            if (stationToLock != gameModule.selectedStation) {
-            
-            }
-        }
-               
-		// select station by making it bigger and removing outline
-		stationToLock.classList.add("selectedStation");
+		} 
+        // if you tapped on a station, stationToLock should already be set
+
 		gameModule.selectedStation = stationToLock;        
-		// set bottom text to station name
-		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
+		
         // Instantly correct position to lock selected station in middle
         if(animate == false) {
+            // select station by making it bigger and removing outline
+            stationToLock.classList.add("selectedStation");
+            // set bottom text to station name
+            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
+            
             gameModule.stationOrd.style.left = (screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5))) + "px";
         }
         // Animate scroll to lock selected station in middle
         else {
             gameModule.animateBottomScroll = true;
             gameModule.animate();
+            
+            // select station by making it bigger and removing outline
+            stationToLock.classList.add("selectedStation");
+            // set bottom text to station name
+            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
         }
         
-        console.log("lockBottomScroll:\n--" + stationToLock);
+        console.log("lockBottomScroll:\n--" + stationToLock.getElementsByClassName('stationOrder__station--label')[0].innerHTML);
 	}
     function displayStartScreen () {
         gameModule.animateDisplayCard = false;
@@ -367,13 +403,17 @@ var gameModule = (function () {
 		selectedStation: null,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
-			new AlloyFinger(this.bottomScrollContainer, {
+            afBottom = new AlloyFinger(this.bottomScrollContainer, {
                 touchStart: function(evt) { 
                     // Get x location of finger press to use in tap events
                     gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
                     evt.preventDefault();
+                    
+                    console.log('00000-----New Event-----00000');
                 },
-				pressMove: function(evt) {                    
+				pressMove: function(evt) {
+                    // Skip function if animation already underway
+                    if (gameModule.animateBottomScroll == true) { return; }
                     // Move stationOrd element along x axis
                     var screenMiddle = window.screen.width * .5;
                     var curLeft = gameModule.stationOrd.offsetLeft;
@@ -395,39 +435,18 @@ var gameModule = (function () {
                     gameModule.stationOrd.style.left = newPosition + "px";
                 }, 
 				touchEnd: function() {
+                    // Skip function if animation already underway
+                    if (gameModule.animateBottomScroll == true) { return; }
                     lockBottomScroll( null, true );
-				},
-                tap: function() {
-                    var screenWidth = window.screen.width;
-                    var selected = document.getElementsByClassName("selectedStation")[0] || null;
-                    var stationToLock = null;
-                    if (selected != null) {
-                        // Select left station
-                        if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .34) {
-                            stationToLock = selected.previousElementSibling;
-                        }
-                        // Select right station
-                        else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .67) {
-                            stationToLock = selected.nextElementSibling;
-                        }
-                        else { return; }
-                        // Remove previous selection and lock on new selection    
-                        if(stationToLock != null) {            
-                            selected.classList.remove("selectedStation");
-                            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-                            
-                            // Lock on newly selected station
-                            lockBottomScroll(stationToLock, true);
-                        }
-                    }
                     
-                    console.log("--tap:\n" + screenWidth / gameModule.bottomScrollContainer.touchStartX);
-                }
+                    console.log('touchEnd');
+				}, 
+                tap: onTapBSC
 			});
 
 			// ————— ————— ————— ————— set up swipe event for main card
 			Transform(this.displayCard);
-			new AlloyFinger(this.displayCard, {
+			afDisplay = new AlloyFinger(this.displayCard, {
 			    pressMove:function(evt){
 			    	var maxMove = 100;
                     if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMove) {
@@ -472,6 +491,7 @@ var gameModule = (function () {
             // Reset game state variables
             gameModule.animateDisplayCard = false;
             gameModule.animateBottomScroll = false;
+            gameModule.selectedStation = null;
             
             // Initialize game object properties to doc elements
             gameModule.displayCard = document.getElementsByClassName("displayCard")[0];
@@ -479,7 +499,6 @@ var gameModule = (function () {
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear any existing elements to start fresh
-            gameModule.selectedStation = null;
             gameModule.stationOrd.innerHTML = "";
             gameModule.stationOrd.style.left = "0px";
             document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
@@ -489,11 +508,12 @@ var gameModule = (function () {
             displayStartScreen();
             
             // There's probably a better way to do this.
-            if(start) {
+            if (start) {
                 start = false;
                 gameModule.setupSwipeEvent();
-                
             }
+
+//            afBottom.off('tap', onTapBSC);
 		},
 		// ———— ———— animation flags:
 		animateDisplayCard: false,
@@ -547,12 +567,12 @@ var gameModule = (function () {
                         gameModule.stationOrd.style.left = final + "px";
                         gameModule.animateBottomScroll = false;
                     }
-console.log('Animate:\n--');
-console.log('middle:' + screenMiddle)
-console.log('current: ' + current); 
-console.log('step: ' + step);
-console.log('allowance: ' + allowance);                                                      
-console.log('final: ' + final);                                  
+//console.log('Animate:\n--');
+//console.log('middle:' + screenMiddle)
+//console.log('current: ' + current); 
+//console.log('step: ' + step);
+//console.log('allowance: ' + allowance);                                                      
+//console.log('final: ' + final);                                  
                 }
 		    }
 			if (gameModule.animateDisplayCard || gameModule.animateBottomScroll) { 

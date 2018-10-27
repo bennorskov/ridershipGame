@@ -20,8 +20,45 @@ var gameModule = (function () {
 	var dataSet = new Map();
 	var displayedStations = new Map();
     var afBottom;
-    var afDisplay;
-    var onTapBSC = function() {
+	var afDisplay;
+	var onTouchStartBottomScrollContainer = function(evt) { 
+		// Get x location of finger press to use in tap events
+		gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
+		evt.preventDefault();
+		
+		console.log('00000-----New Event-----00000');
+	};
+	var onPressMoveBottomScrollContainer = function(evt) {
+		// Skip function if animation already underway
+		if (gameModule.animateBottomScroll == true) { return; }
+		// Move stationOrd element along x axis
+		var screenMiddle = window.screen.width * .5;
+		var curLeft = gameModule.stationOrd.offsetLeft;
+		var newPosition = evt.deltaX + curLeft;
+
+		// If there is a station selected, unselect it while scrolling
+		var selected = document.getElementsByClassName("selectedStation")[0] || null;
+		if (selected != null) {
+			selected.classList.remove("selectedStation");
+			document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
+		}
+		// Move stationOrd, restricting it from leaving the screen entirely
+		if(newPosition > screenMiddle) {
+			newPosition = screenMiddle;
+		}
+		else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
+			newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
+		}
+		gameModule.stationOrd.style.left = newPosition + "px";
+	};
+	var onTouchEndBottomScrollContainer = function() {
+		// Skip function if animation already underway
+		if (gameModule.animateBottomScroll == true) { return; }
+		lockBottomScroll( null, true );
+		
+		console.log('touchEnd');
+	};
+    var onTapBottomScrollContainer = function() {
         // Skip function if animation already underway
         if (gameModule.animateBottomScroll == true) { return; }
         var screenWidth = window.screen.width;
@@ -184,8 +221,13 @@ var gameModule = (function () {
             return;
         } else if(gameModule.selectedStation == null) {
 			addToBottomScroll(swipedStation);
-            changeDisplayCard( getRandomStationName() );
-//            afBottom.on('tap', onTapBSC);
+			changeDisplayCard( getRandomStationName() );
+			afBottom.on('touchStart', onTouchStartBottomScrollContainer);
+            afBottom.on('pressMove', onPressMoveBottomScrollContainer);
+            afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
+			afBottom.on('tap', onTapBottomScrollContainer);
+			
+            afBottom.on('tap', onTapBottomScrollContainer);
             return;    
         } else if(swipedStation == "Game Over") {
             gameModule.init()
@@ -332,7 +374,11 @@ var gameModule = (function () {
         }
         // Animate scroll to lock selected station in middle
         else {
-            gameModule.animateBottomScroll = true;
+			afBottom.off('touchStart', onTouchStartBottomScrollContainer);
+            afBottom.off('pressMove', onPressMoveBottomScrollContainer);
+            afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
+			afBottom.off('tap', onTapBottomScrollContainer);
+			gameModule.animateBottomScroll = true;
             gameModule.animate();
             
             // select station by making it bigger and removing outline
@@ -404,44 +450,10 @@ var gameModule = (function () {
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
             afBottom = new AlloyFinger(this.bottomScrollContainer, {
-                touchStart: function(evt) { 
-                    // Get x location of finger press to use in tap events
-                    gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
-                    evt.preventDefault();
-                    
-                    console.log('00000-----New Event-----00000');
-                },
-				pressMove: function(evt) {
-                    // Skip function if animation already underway
-                    if (gameModule.animateBottomScroll == true) { return; }
-                    // Move stationOrd element along x axis
-                    var screenMiddle = window.screen.width * .5;
-                    var curLeft = gameModule.stationOrd.offsetLeft;
-                    var newPosition = evt.deltaX + curLeft;
-
-                    // If there is a station selected, unselect it while scrolling
-                    var selected = document.getElementsByClassName("selectedStation")[0] || null;
-                    if (selected != null) {
-                        selected.classList.remove("selectedStation");
-                        document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-                    }
-                    // Move stationOrd, restricting it from leaving the screen entirely
-                    if(newPosition > screenMiddle) {
-                        newPosition = screenMiddle;
-                    }
-                    else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
-                        newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
-                    }
-                    gameModule.stationOrd.style.left = newPosition + "px";
-                }, 
-				touchEnd: function() {
-                    // Skip function if animation already underway
-                    if (gameModule.animateBottomScroll == true) { return; }
-                    lockBottomScroll( null, true );
-                    
-                    console.log('touchEnd');
-				}, 
-                tap: onTapBSC
+                touchStart: onTouchStartBottomScrollContainer,
+				pressMove: onPressMoveBottomScrollContainer, 
+				touchEnd: onTouchEndBottomScrollContainer, 
+                tap: onTapBottomScrollContainer
 			});
 
 			// ————— ————— ————— ————— set up swipe event for main card
@@ -512,8 +524,10 @@ var gameModule = (function () {
                 start = false;
                 gameModule.setupSwipeEvent();
             }
-
-//            afBottom.off('tap', onTapBSC);
+            afBottom.off('touchStart', onTouchStartBottomScrollContainer);
+            afBottom.off('pressMove', onPressMoveBottomScrollContainer);
+            afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
+            afBottom.off('tap', onTapBottomScrollContainer);
 		},
 		// ———— ———— animation flags:
 		animateDisplayCard: false,
@@ -565,7 +579,11 @@ var gameModule = (function () {
                     else {
                         // End animation
                         gameModule.stationOrd.style.left = final + "px";
-                        gameModule.animateBottomScroll = false;
+						gameModule.animateBottomScroll = false;
+						afBottom.on('touchStart', onTouchStartBottomScrollContainer);
+						afBottom.on('pressMove', onPressMoveBottomScrollContainer);
+						afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
+						afBottom.on('tap', onTapBottomScrollContainer);
                     }
 //console.log('Animate:\n--');
 //console.log('middle:' + screenMiddle)

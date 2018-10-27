@@ -226,8 +226,6 @@ var gameModule = (function () {
             afBottom.on('pressMove', onPressMoveBottomScrollContainer);
             afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
 			afBottom.on('tap', onTapBottomScrollContainer);
-			
-            afBottom.on('tap', onTapBottomScrollContainer);
             return;    
         } else if(swipedStation == "Game Over") {
             gameModule.init()
@@ -240,7 +238,8 @@ var gameModule = (function () {
 		// store riderships in "card" and "selected" then compare
 		var card = dataSet.get(swipedStation).ridership;
 		var selected = displayedStations.get( gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
-		
+		var selectedElement = document.getElementsByClassName("selectedStation")[0];
+
         // more temporary test code to help with comparisons
         console.log(card + ": " + swipedStation + "\n" + selected + ": " + gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
         // end test code
@@ -251,9 +250,21 @@ var gameModule = (function () {
 		*	Right now, we're only checking against the selected station
 		*/
 		if (card > selected && direction > 0) { // bigger swipe (right)
-			addToBottomScroll(swipedStation);
+			// Check station to right of selected
+			if (selectedElement.nextElementSibling == null || (displayedStations.get(selectedElement.nextElementSibling.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership > card)) {
+				addToBottomScroll(swipedStation);
+			} else {
+				displayLoseScreen();
+            	return;
+			}
 		} else if (card < selected && direction < 0){ // smaller swipe (left)
-			addToBottomScroll(swipedStation);
+			// Check station to left of selected
+			if (selectedElement.previousElementSibling == null || (displayedStations.get(selectedElement.previousElementSibling.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership < card)) {
+				addToBottomScroll(swipedStation);
+			} else {
+				displayLoseScreen();
+            	return;
+			}
 		} else {  
             displayLoseScreen();
             return;

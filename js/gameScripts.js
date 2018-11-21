@@ -215,7 +215,8 @@ var gameModule = (function () {
 		*	swipedStation is a string
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
-      
+	  
+		// Check for game win/lose events
         if(swipedStation == "Swipe to Play") {
             changeDisplayCard(getRandomStationName());
             return;
@@ -227,13 +228,10 @@ var gameModule = (function () {
             afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
 			afBottom.on('tap', onTapBottomScrollContainer);
             return;    
-        } else if(swipedStation == "Game Over") {
+        } else if(swipedStation == "Game Over" || swipedStation == "You Win") {
             gameModule.init()
             return;
-        } else if(swipedStation == "You Win") {
-            gameModule.init();
-            return;
-        }      
+        } 
         
 		// store riderships in "card" and "selected" then compare
 		var card = dataSet.get(swipedStation).ridership;
@@ -244,19 +242,17 @@ var gameModule = (function () {
         console.log(card + ": " + swipedStation + "\n" + selected + ": " + gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
         // end test code
         
-		/*
-		*	Future step! (Issue created on github)
-		* 	Need to check against all added stations
-		*	Right now, we're only checking against the selected station
-		*/
+		//	Need to check against selected and adjacent stations
 		if (card > selected && direction > 0) { // bigger swipe (right)
 			// Check station to right of selected
-			if (selectedElement.nextElementSibling == null || (displayedStations.get(selectedElement.nextElementSibling.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership > card)) {
-				addToBottomScroll(swipedStation);
-			} else {
+			var rightStation = selectedElement.nextElementSibling;
+			if (rightStation != null && displayedStations.get(rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership < card) {
+console.log(displayedStations.get(rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership + ": " + rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText);					
 				displayLoseScreen();
-            	return;
-			}
+				return;
+			} else {
+				addToBottomScroll(swipedStation);
+			}		
 		} else if (card < selected && direction < 0){ // smaller swipe (left)
 			// Check station to left of selected
 			if (selectedElement.previousElementSibling == null || (displayedStations.get(selectedElement.previousElementSibling.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership < card)) {
@@ -414,21 +410,27 @@ var gameModule = (function () {
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);
     }
-    function displayLoseScreen () {
+    function displayLoseScreen (card=null, selected=null, adjacent=null) {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
         gameModule.animateDisplayCard = false;
         gameModule.animateBottomScroll = false;
         console.log("Game Over, dude!");     
-        
-//        var cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
-//        var selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
-//        var cardRiders = dataSet.get(cardName).ridership;
-//		  var selectedRiders = displayedStations.get(selectedName).ridership;
+		
+		if (card == null){
+			var cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
+			var cardRiders = dataSet.get(cardName).ridership;
+		}
+		if (selected == null){
+			var selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
+			var selectedRiders = displayedStations.get(selectedName).ridership;
+		}
                
         gameModule.displayCard.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
-        var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><h3>Swipe to play again.</h3>";
+		var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br>";
+		_html += cardRiders + ": " + cardName + "<br>" + selectedRiders + ": " + selectedName;
+		_html += "<br><br><h3>Swipe to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
 		gameModule.displayCard.appendChild(temp.content);
@@ -576,7 +578,7 @@ var gameModule = (function () {
                     var screenMiddle = window.screen.width *.5;
                     var current = parseInt(gameModule.stationOrd.style.left);
                     var final = screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5));
-                    var step = 4;
+                    var step = 6;
                     var allowance = step + 1;
 
                     if(current > final && (current > (final + allowance))) {

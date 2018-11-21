@@ -101,56 +101,68 @@ var gameModule = (function () {
         dataSet = new Map();
         displayedStations = new Map();
 
-		dataSet.set( 
-			"14th St-Union Square", {
+		dataSet.set( "14th St-Union Square", {
+			name: "14th St-Union Square",
 			lines: ["4", "5", "6", "n", "q", "r", "l"],
 			ridership: 34557551
 		});
 		dataSet.set( "Grand Central-42nd St", {
+			name: "Grand Central-42nd St",
 			lines: ["4", "5", "6", "7", "s"],
 			ridership: 44928488
 		});
 		dataSet.set("Times Square-42 St", {
+			name: "Times Square-42 St",
 			lines: ["n", "q", "r", "w", "s", "1", "2", "3", "7", "a", "c", "e"],
 			ridership: 64815739
 		});
 		dataSet.set( "34 St-Herald Sq", {
+			name: "34 St-Herald Sq",
 			lines: ["n", "q", "r", "w", "m", "f", "d", "b"],
 			ridership: 39672507
 		});
 		dataSet.set("34 St-Penn Station", {
+			name: "34 St-Penn Station",
 			lines: ["1", "2", "3", "a", "c", "e"],
 			ridership: 50400738		
 		});
 		dataSet.set("Fulton St", {
+			name: "Fulton St",
 			lines: ["a", "c", "j", "z", "2", "3", "4", "5"],
 			ridership: 26838473
 		});
 		dataSet.set("59 St-Columbus Circle", {
+			name: "59 St-Columbus Circle",
 			lines: ["a", "c", "d", "b", "1"],
 			ridership: 22929203
 		});
 		dataSet.set("Lexington Av / 59 St", {
+			name: "Lexington Av / 59 St",
 			lines: ["4", "5", "6", "n", "w", "r"],
 			ridership: 17888188
 		});
 		dataSet.set("86 St", {
+			name: "86 St",
 			lines: ["4", "5", "6"],
 			ridership: 14277369
 		});
 		dataSet.set("Lexington Av-53 St", {
+			name: "Lexington Av-53 St",
 			lines: ["e", "m", "6"],
 			ridership: 18940774
 		});
 		dataSet.set("Flushing-Main St", {
+			name: "Flushing-Main St",
 			lines: ["7"],
 			ridership: 18746832
 		});
 		dataSet.set("47-50 Sts-Rockefeller Center", {
+			name: "47-50 Sts-Rockefeller Center",
 			lines: ["b", "d", "f", "m"],
 			ridership: 17471620
 		});
 		dataSet.set("74-Bway/Jackson Hts-Roosevelt Av", {
+			name: "74-Bway/Jackson Hts-Roosevelt Av",
 			lines: ["e"],
 			ridership: 17095073
 		});
@@ -233,29 +245,41 @@ var gameModule = (function () {
             return;
         } 
         
-		// store riderships in "card" and "selected" then compare
-		var card = dataSet.get(swipedStation).ridership;
-		var selected = displayedStations.get( gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText ).ridership;
-		var selectedElement = document.getElementsByClassName("selectedStation")[0];
+		// store stations in "card" and "selected" then compare
+		var card = dataSet.get(swipedStation);
+		var selected = displayedStations.get(gameModule.getSelectedStation().getElementsByClassName("stationOrder__station--label")[0].innerText);
+		var rightStation = gameModule.getSelectedStation().nextElementSibling;
+		if (rightStation != null) {
+			rightStation = displayedStations.get(rightStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+		}
+		var leftStation = gameModule.getSelectedStation().previousElementSibling;
+		if (leftStation != null) {
+			leftStation = displayedStations.get(leftStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+		}
 
         // more temporary test code to help with comparisons
-        console.log(card + ": " + swipedStation + "\n" + selected + ": " + gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+        console.log(card.ridership + ": " + card.name + "\n" + selected.ridership + ": " + selected.name);
         // end test code
         
 		//	Need to check against selected and adjacent stations
-		if (card > selected && direction > 0) { // bigger swipe (right)
-			// Check station to right of selected
-			var rightStation = selectedElement.nextElementSibling;
-			if (rightStation != null && displayedStations.get(rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership < card) {
-console.log(displayedStations.get(rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership + ": " + rightStation.getElementsByClassName('stationOrder__station--label')[0].innerText);					
-				displayLoseScreen();
-				return;
-			} else {
+		if (direction > 0 && selected.ridership < card.ridership) {
+			// Check station to right of selected	
+			if (rightStation == null) {
 				addToBottomScroll(swipedStation);
-			}		
-		} else if (card < selected && direction < 0){ // smaller swipe (left)
+			}
+			else if (card.ridership < rightStation.ridership) {
+				addToBottomScroll(swipedStation);	
+			}
+			else {
+				displayLoseScreen();
+            	return;
+			}
+		} else if (direction < 0 && card.ridership < selected.ridership) { 
 			// Check station to left of selected
-			if (selectedElement.previousElementSibling == null || (displayedStations.get(selectedElement.previousElementSibling.getElementsByClassName('stationOrder__station--label')[0].innerText).ridership < card)) {
+			if (leftStation == null) {
+				addToBottomScroll(swipedStation);
+			} 
+			else if (leftStation.ridership < card.ridership) {
 				addToBottomScroll(swipedStation);
 			} else {
 				displayLoseScreen();
@@ -266,14 +290,14 @@ console.log(displayedStations.get(rightStation.getElementsByClassName('stationOr
             return;
         }
         
-        // WIN CONDITION check (if dataSet is out of stations)
+        // WIN CONDITION check (if dataSet of stations is empty)
         if(dataSet.size < 1) {
             console.log('dataSet is empty! You Win!');
             displayWinScreen();
-            return;
-        }
-        
-		changeDisplayCard( getRandomStationName() );
+		}
+		else {
+			changeDisplayCard( getRandomStationName() );			
+		}
 	}
 	function getRandomStationName() {
 		// find a random station name from all station names not yet added
@@ -455,6 +479,10 @@ console.log(displayedStations.get(rightStation.getElementsByClassName('stationOr
 		getDataSet: function() {
 			// dataSet is private
 			return dataSet;
+		},
+		getSelectedStation: function() {
+			// selectedStation is dependent on document state
+			return document.getElementsByClassName('selectedStation')[0];
 		},
 		displayCard: "",
 		stationOrd: "",

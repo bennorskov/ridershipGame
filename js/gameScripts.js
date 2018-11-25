@@ -271,7 +271,7 @@ var gameModule = (function () {
 				addToBottomScroll(swipedStation);	
 			}
 			else {
-				displayLoseScreen();
+				displayLoseScreen([card, selected, rightStation]);
             	return;
 			}
 		} else if (direction < 0 && card.ridership < selected.ridership) { 
@@ -282,11 +282,11 @@ var gameModule = (function () {
 			else if (leftStation.ridership < card.ridership) {
 				addToBottomScroll(swipedStation);
 			} else {
-				displayLoseScreen();
+				displayLoseScreen([card, selected, leftStation]);
             	return;
 			}
 		} else {  
-            displayLoseScreen();
+            displayLoseScreen([card, selected]);
             return;
         }
         
@@ -434,27 +434,22 @@ var gameModule = (function () {
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);
     }
-    function displayLoseScreen (card=null, selected=null, adjacent=null) {
+    function displayLoseScreen (stationArray) {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
         gameModule.animateDisplayCard = false;
         gameModule.animateBottomScroll = false;
         console.log("Game Over, dude!");     
-		
-		if (card == null){
-			var cardName = gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText;
-			var cardRiders = dataSet.get(cardName).ridership;
-		}
-		if (selected == null){
-			var selectedName = gameModule.selectedStation.getElementsByClassName("stationOrder__station--label")[0].innerText;
-			var selectedRiders = displayedStations.get(selectedName).ridership;
-		}
-               
+
+		stationArray.sort(function(a, b) {return a.ridership - b.ridership});
         gameModule.displayCard.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
 		var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br>";
-		_html += cardRiders + ": " + cardName + "<br>" + selectedRiders + ": " + selectedName;
-		_html += "<br><br><h3>Swipe to play again.</h3>";
+		_html += "<br>Correct order:<br>";
+		for (station of stationArray) {
+			_html += "<span>" + station.name + "</span><br>  ";
+		}
+		_html += "<br><h3>Swipe to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
 		gameModule.displayCard.appendChild(temp.content);
@@ -551,7 +546,7 @@ var gameModule = (function () {
             gameModule.bottomScrollContainer = document.getElementsByClassName('bottomScrollContainer')[0];
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
-            // Clear any existing elements to start fresh
+            // Clear existing stations to start fresh
             gameModule.stationOrd.innerHTML = "";
             gameModule.stationOrd.style.left = "0px";
             document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
@@ -560,7 +555,6 @@ var gameModule = (function () {
             
             displayStartScreen();
             
-            // There's probably a better way to do this.
             if (start) {
                 start = false;
                 gameModule.setupSwipeEvent();
@@ -606,7 +600,7 @@ var gameModule = (function () {
                     var screenMiddle = window.screen.width *.5;
                     var current = parseInt(gameModule.stationOrd.style.left);
                     var final = screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5));
-                    var step = 6;
+					var step = Math.max(Math.abs(final - current) * .15, 3);
                     var allowance = step + 1;
 
                     if(current > final && (current > (final + allowance))) {

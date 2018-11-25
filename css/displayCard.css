@@ -1,24 +1,29 @@
 .displayCard {
   width: 70vw;
-  margin: 18vh auto;
+  margin: 5vh auto;
   background: black;
   color: white;
-  padding: 2em; }
-  .displayCard__title {
-    font-size: 2em; }
-  .displayCard__lines {
-    font-size: 1.3em; }
-    .displayCard__lines--circle {
-      width: 1.7em;
-      height: 1.7em;
-      margin-top: 0.5em;
-      border-radius: 1em;
-      text-align: center;
-      line-height: 1.8em;
-      font-weight: bold;
-      font-size: 1.2em;
-      vertical-align: middle;
-      color: white;
-      display: inline-block; }
+  padding: 2em;
+}
+.displayCard__title {
+  font-size: 2em;
+}
+
+.displayCard__lines {
+  font-size: 1.3em;
+}
+.displayCard__lines--circle {
+  width: 1.7em;
+  height: 1.7em;
+  margin-top: 0.5em;
+  border-radius: 1em;
+  text-align: center;
+  line-height: 1.8em;
+  font-weight: bold;
+  font-size: 1.2em;
+  vertical-align: middle;
+  color: white;
+  display: inline-block;
+}
 
 /*# sourceMappingURL=displayCard.css.map */

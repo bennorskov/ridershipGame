@@ -53,8 +53,9 @@ var gameModule = (function () {
 	};
 	var onTouchEndBottomScrollContainer = function() {
 		// Skip function if animation already underway
-		if (gameModule.animateBottomScroll == true) { return; }
-		lockBottomScroll( null, true );
+		if (gameModule.animateBottomScroll == false) {
+			lockBottomScroll( null, true );
+		}
 		
 		console.log('touchEnd');
 	};
@@ -76,9 +77,6 @@ var gameModule = (function () {
             else { stationToLock = selected; }
             // Remove previous selection and lock on new selection    
             if(stationToLock != null) {            
-                selected.classList.remove("selectedStation");
-                document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-
                 // Lock on newly selected station
                 lockBottomScroll(stationToLock, true);
             }
@@ -232,7 +230,7 @@ var gameModule = (function () {
         if(swipedStation == "Swipe to Play") {
             changeDisplayCard(getRandomStationName());
             return;
-        } else if(gameModule.selectedStation == null) {
+        } else if(gameModule.getSelectedStation() == null) {
 			addToBottomScroll(swipedStation);
 			changeDisplayCard( getRandomStationName() );
 			afBottom.on('touchStart', onTouchStartBottomScrollContainer);
@@ -324,6 +322,7 @@ var gameModule = (function () {
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
+		var newStation = null;
 		
         var _html = "<div class='stationOrder__station " + className + "'>";
 		_html += "<h1 class='stationOrder__station--label'>" + stationToAdd + "</h1>";
@@ -335,8 +334,8 @@ var gameModule = (function () {
 		temp.innerHTML = _html.trim(); // remove extra whitespace
                 
         // Insert stationToAdd into stationOrder in correct ranking of ridership
-        if(gameModule.selectedStation == null) {
-            gameModule.stationOrd.appendChild(temp.content.firstChild);
+        if(gameModule.getSelectedStation() == null) {
+            newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
         }
         else {
             var added = false;
@@ -348,22 +347,24 @@ var gameModule = (function () {
                 var addRiders = dataSet.get(stationToAdd).ridership;
                 
                 if (addRiders < chiRiders) {
-                    gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
+                    newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
                     added = true;
                     break;
                 }
             }
             if(added == false) {
-                gameModule.stationOrd.appendChild(temp.content.firstChild);
+                newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
             } 
         }
         
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
         dataSet.delete(stationToAdd);  
-        lockBottomScroll(gameModule.selectedStation, false);
+        lockBottomScroll(gameModule.getSelectedStation(), false);
         
-        console.log("addToBottomScroll:\n--" + stationToAdd);
+		console.log("addToBottomScroll:\n--" + stationToAdd);
+
+		return newStation;
 	}
 	function lockBottomScroll ( stationToLock=null, animate=false ) {
         // Skip function if animation already underway
@@ -392,15 +393,19 @@ var gameModule = (function () {
 		} 
         // if you tapped on a station, stationToLock should already be set
 
+		// Reset gameModule.selectedStation
+		if(gameModule.getSelectedStation() != null) {
+			gameModule.getSelectedStation().classList.remove("selectedStation");
+		//	document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
+		}
 		gameModule.selectedStation = stationToLock;        
-		
+		// select station by making it bigger and removing outline
+		stationToLock.classList.add("selectedStation");
+		// set bottom text to station name
+		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
+
         // Instantly correct position to lock selected station in middle
         if(animate == false) {
-            // select station by making it bigger and removing outline
-            stationToLock.classList.add("selectedStation");
-            // set bottom text to station name
-            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
-            
             gameModule.stationOrd.style.left = (screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5))) + "px";
         }
         // Animate scroll to lock selected station in middle
@@ -411,11 +416,6 @@ var gameModule = (function () {
 			afBottom.off('tap', onTapBottomScrollContainer);
 			gameModule.animateBottomScroll = true;
             gameModule.animate();
-            
-            // select station by making it bigger and removing outline
-            stationToLock.classList.add("selectedStation");
-            // set bottom text to station name
-            document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
         }
         
         console.log("lockBottomScroll:\n--" + stationToLock.getElementsByClassName('stationOrder__station--label')[0].innerHTML);
@@ -438,20 +438,25 @@ var gameModule = (function () {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
         gameModule.animateDisplayCard = false;
         gameModule.animateBottomScroll = false;
-        console.log("Game Over, dude!");     
+		console.log("Game Over, dude!");     
+		
+		var newElement = addToBottomScroll(gameModule.displayCard.getElementsByClassName('displayCard__title')[0].innerText);
+		lockBottomScroll(newElement, true);
+		var currentSelected = newElement.getElementsByClassName("stationOrder__station--label")[0].innerText;
 
 		stationArray.sort(function(a, b) {return a.ridership - b.ridership});
-        gameModule.displayCard.innerHTML = "";
 
         // it's less hacky to create a temporary dom element than use a hidden one
-		var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br>";
-		_html += "<br>Correct order:<br>";
-		for (station of stationArray) {
-			_html += "<span>" + station.name + "</span><br>  ";
-		}
-		_html += "<br><h3>Swipe to play again.</h3>";
+		var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><br>";
+		_html += "The correct placement of " + currentSelected + " is shown below.<br>"
+// _html += "Correct order:<br>";
+// for (station of stationArray) {
+// 	_html += "<span>" + station.name + "</span><br>  ";
+// }
+		_html += "<br><h3>Swipe here to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
+		gameModule.displayCard.innerHTML = "";
 		gameModule.displayCard.appendChild(temp.content);
     }
     function displayWinScreen () {
@@ -595,7 +600,7 @@ var gameModule = (function () {
 		    }
 		    if (gameModule.animateBottomScroll) {
                 // Animate selected station to center of screen
-                var stationToLock = gameModule.selectedStation;
+                var stationToLock = gameModule.getSelectedStation();
                 if (stationToLock != null && stationToLock != undefined) {
                     var screenMiddle = window.screen.width *.5;
                     var current = parseInt(gameModule.stationOrd.style.left);

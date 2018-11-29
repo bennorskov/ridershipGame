@@ -227,7 +227,7 @@ var gameModule = (function () {
 		*/
 	  
 		// Check for game win/lose events
-        if(swipedStation == "Swipe to Play") {
+        if(swipedStation == "Subway Riders") {
             changeDisplayCard(getRandomStationName());
             return;
         } else if(gameModule.getSelectedStation() == null) {
@@ -421,18 +421,25 @@ var gameModule = (function () {
         console.log("lockBottomScroll:\n--" + stationToLock.getElementsByClassName('stationOrder__station--label')[0].innerHTML);
 	}
     function displayStartScreen () {
+		var startingStation = getRandomStationName();
+
         gameModule.animateDisplayCard = false;
         gameModule.animateBottomScroll = false;
-        gameModule.displayCard.innerHTML = "";
+		gameModule.displayCard.innerHTML = "";
 
         // Display instructions
         // it's less hacky to create a temporary dom element than use a hidden one
-        var _html = "<hr><h1 class='displayCard__title'>Swipe to Play</h1><br>";
-        _html += "<h3><- Swipe this sign to the left if the station on it is less busy than station selected at bottom. <br>-> Swipe sign right if it is busier than selected station.</h3><br>";
-        _html += "<h3>Swipe bottom of screen to select a different station.</h3>";
+		var _html = "<hr><h1 class='displayCard__title'>Subway Riders</h1>";
+		_html += "<p>Rank stations in order of annual ridership.</p><br>"
+		_html += "<p><-----Swipe this sign left if its station has fewer riders than " + startingStation + ".</p><br>";
+		_html += "<p align='right'>Swipe right if it has more riders than " + startingStation + ".-----></p><br>";
+		_html += "<p>Scroll along the bottom to select different stations for comparison.</p><br>";
+		_html += "<p>Swipe either direction to start.</p>"
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);
+
+		addToBottomScroll(startingStation);
     }
     function displayLoseScreen (stationArray) {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
@@ -564,10 +571,10 @@ var gameModule = (function () {
                 start = false;
                 gameModule.setupSwipeEvent();
             }
-            afBottom.off('touchStart', onTouchStartBottomScrollContainer);
-            afBottom.off('pressMove', onPressMoveBottomScrollContainer);
-            afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
-            afBottom.off('tap', onTapBottomScrollContainer);
+            // afBottom.off('touchStart', onTouchStartBottomScrollContainer);
+            // afBottom.off('pressMove', onPressMoveBottomScrollContainer);
+            // afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
+            // afBottom.off('tap', onTapBottomScrollContainer);
 		},
 		// ———— ———— animation flags:
 		animateDisplayCard: false,
@@ -624,13 +631,7 @@ var gameModule = (function () {
 						afBottom.on('pressMove', onPressMoveBottomScrollContainer);
 						afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
 						afBottom.on('tap', onTapBottomScrollContainer);
-                    }
-//console.log('Animate:\n--');
-//console.log('middle:' + screenMiddle)
-//console.log('current: ' + current); 
-//console.log('step: ' + step);
-//console.log('allowance: ' + allowance);                                                      
-//console.log('final: ' + final);                                  
+                    }                             
                 }
 		    }
 			if (gameModule.animateDisplayCard || gameModule.animateBottomScroll) { 
@@ -640,6 +641,3 @@ var gameModule = (function () {
 		}
 	}
 })();
-
-
-

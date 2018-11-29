@@ -431,10 +431,10 @@ var gameModule = (function () {
         // it's less hacky to create a temporary dom element than use a hidden one
 		var _html = "<hr><h1 class='displayCard__title'>Subway Riders</h1>";
 		_html += "<p>Rank stations in order of annual ridership.</p><br>"
-		_html += "<p><-----Swipe this sign left if its station has fewer riders than " + startingStation + ".</p><br>";
-		_html += "<p align='right'>Swipe right if it has more riders than " + startingStation + ".-----></p><br>";
-		_html += "<p>Scroll along the bottom to select different stations for comparison.</p><br>";
-		_html += "<p>Swipe either direction to start.</p>"
+		_html += "<p><-----Swipe this station sign left if it has fewer riders than " + startingStation + ".</p><br>";
+		_html += "<p align='right'>----->Swipe right if it has more riders than " + startingStation + ".</p><br>";
+		_html += "<p>Scroll along the bottom to select a different station. ";
+		_html += "Swipe either direction to start.</p>"
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);

@@ -52,6 +52,10 @@ $stationMargin: $stationWidth/2 + 1
             .stationOrder__station--lineLabel
                 font-size: 3em
                 top: $stationWidth * .25
+        &.lockedRight
+            margin-right: 0
+        &.lockedLeft
+            margin-left: 0
         @at-root #{&}--lineLabel
             width: inherit
             height: inherit

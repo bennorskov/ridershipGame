@@ -1,66 +1,91 @@
+.bottomScrollContainer {
+  position: static;
+  width: 100vw;
+  height: 50vh;
+  overflow: hidden;
+}
+
 .stationOrder {
   text-align: center;
   position: fixed;
-  bottom: 13vh;
+  bottom: 15vh;
   height: 13vw;
   overflow: visible;
   white-space: nowrap;
   text-overflow: nowrap;
-  left: 0px; }
-  .stationOrder__station {
-    transition: all 0.2sec;
-    border-radius: 7.5vw;
-    border: solid black 1vw;
-    width: 13vw;
-    height: 13vw;
-    display: inline-block;
-    position: relative;
-    margin-top: -6.5vw;
-    margin-left: 5.5vw;
-    margin-right: 5.5vw;
-    margin-bottom: 0; }
-    .stationOrder__station--label {
-      left: -2vw;
-      top: -17vw;
-      font-size: 0.75em;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      width: 15vh;
-      transform: rotate(-65deg);
-      position: absolute;
-      text-align: center;
-      color: #b3b3b3; }
-    .stationOrder__station.selectedStation {
-      border-radius: 11.5vw;
-      width: 19vw;
-      height: 19vw;
-      margin-top: -19.5vw;
-      margin-left: 7.5vw;
-      margin-right: 7.5vw;
-      margin-bottom: -1.5vw;
-      border: none; }
-      .stationOrder__station.selectedStation .stationOrder__station--label {
-        display: none; }
-      .stationOrder__station.selectedStation .stationOrder__station--lineLabel {
-        font-size: 3em;
-        top: 3.25vw; }
-    .stationOrder__station--lineLabel {
-      width: inherit;
-      height: inherit;
-      vertical-align: middle;
-      color: inherit;
-      text-align: center;
-      font-size: 2em;
-      line-height: 13vw;
-      position: absolute; }
-  .stationOrder__selectedStationLabel {
-    font-size: 2em;
-    position: fixed;
-    bottom: 5vh;
-    margin: auto;
-    width: 100%;
-    text-align: center;
-    color: white; }
+  left: 0px;
+}
+.stationOrder__station {
+  transition: all 0.2sec;
+  border-radius: 7.5vw;
+  border: solid black 1vw;
+  width: 13vw;
+  height: 13vw;
+  display: inline-block;
+  position: relative;
+  margin-top: -6.5vw;
+  margin-left: 5.5vw;
+  margin-right: 5.5vw;
+  margin-bottom: 0;
+}
+.stationOrder__station--label {
+  left: -2vw;
+  top: -17vw;
+  font-size: 0.75em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 15vh;
+  transform: rotate(-65deg);
+  position: absolute;
+  text-align: left;
+  color: #b3b3b3;
+}
+
+.stationOrder__station.selectedStation {
+  border-radius: 11.5vw;
+  width: 19vw;
+  height: 19vw;
+  margin-top: -19.5vw;
+  margin-left: 7.5vw;
+  margin-right: 7.5vw;
+  margin-bottom: -1.5vw;
+  border: none;
+}
+.stationOrder__station.selectedStation .stationOrder__station--label {
+  display: none;
+}
+.stationOrder__station.selectedStation .stationOrder__station--lineLabel {
+  font-size: 3em;
+  top: 3.25vw;
+}
+.stationOrder__station.lockedRight {
+  margin-right: -0.5vw;
+  border-right: solid gold 1vw;
+}
+.stationOrder__station.lockedLeft {
+  margin-left: -0.5vw;
+  border-left: solid gold 1vw;
+}
+.stationOrder__station--lineLabel {
+  width: inherit;
+  height: inherit;
+  vertical-align: middle;
+  color: inherit;
+  text-align: center;
+  font-size: 2em;
+  line-height: 13vw;
+  position: absolute;
+}
+
+.stationOrder__selectedStationLabel {
+  font-size: 2em;
+  position: fixed;
+  bottom: 5vh;
+  margin: auto;
+  width: 100%;
+  text-align: center;
+  color: white;
+}
 
 /*# sourceMappingURL=stationOrder.css.map */

@@ -1,3 +1,9 @@
+// // Station Factory 
+// class stationFactory {
+// 	function buildStation() {
+// 	};
+// };
+
 /*
 *	Main Game engine
 *
@@ -13,14 +19,22 @@
 *	
 *
 */
-
 var gameModule = (function () {
 	// As the game progresses, move stations into displayedStations and delete from dataSet
     var start = true;  // There's probably a better way to do this.    
 	var dataSet = new Map();
+	var sortedSet = [];
 	var displayedStations = new Map();
     var afBottom;
 	var afDisplay;
+	// Station Object
+	class station {
+		constructor(options) {
+			this.name = options.name || '';
+			this.lines = options.lines || [];
+			this.ridership = options.ridership || 0;
+		};
+	};
 	var onTouchStartBottomScrollContainer = function(evt) { 
 		// Get x location of finger press to use in tap events
 		gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
@@ -83,7 +97,27 @@ var gameModule = (function () {
         }
 
         console.log("--tap:\n" + parseInt(gameModule.bottomScrollContainer.touchStartX / (screenWidth/3)));
-    };
+	};
+	function buildStation() {
+
+	};
+	function scrapeFile(input) {
+		const file = input.target.files[0];
+		const reader = new FileReader();
+	
+		reader.onload = (event) => {
+			const file = event.target.result;
+			const allLines = file.split(/\r\n|\n/);
+			// Reading line by line
+			allLines.forEach((line) => {
+				console.log(line);
+			});
+		};
+	
+		reader.onerror = (event) => {
+			alert(event.target.error.name);
+		};
+	};	   
 	function setupDataObject() {
 		/*
 		*	Syntaxt for acessing data:
@@ -102,68 +136,87 @@ var gameModule = (function () {
 		dataSet.set( "14th St-Union Square", {
 			name: "14th St-Union Square",
 			lines: ["4", "5", "6", "n", "q", "r", "l"],
-			ridership: 34557551
+			ridership: 34557551,
+			rank: 8
 		});
 		dataSet.set( "Grand Central-42nd St", {
 			name: "Grand Central-42nd St",
 			lines: ["4", "5", "6", "7", "s"],
-			ridership: 44928488
+			ridership: 44928488,
+			rank: 10
 		});
 		dataSet.set("Times Square-42 St", {
 			name: "Times Square-42 St",
 			lines: ["n", "q", "r", "w", "s", "1", "2", "3", "7", "a", "c", "e"],
-			ridership: 64815739
+			ridership: 64815739,
+			rank: 12
 		});
 		dataSet.set( "34 St-Herald Sq", {
 			name: "34 St-Herald Sq",
 			lines: ["n", "q", "r", "w", "m", "f", "d", "b"],
-			ridership: 39672507
+			ridership: 39672507,
+			rank: 9
 		});
 		dataSet.set("34 St-Penn Station", {
 			name: "34 St-Penn Station",
 			lines: ["1", "2", "3", "a", "c", "e"],
-			ridership: 50400738		
+			ridership: 50400738,
+			rank: 11		
 		});
 		dataSet.set("Fulton St", {
 			name: "Fulton St",
 			lines: ["a", "c", "j", "z", "2", "3", "4", "5"],
-			ridership: 26838473
+			ridership: 26838473,
+			rank: 7
 		});
 		dataSet.set("59 St-Columbus Circle", {
 			name: "59 St-Columbus Circle",
 			lines: ["a", "c", "d", "b", "1"],
-			ridership: 22929203
+			ridership: 22929203,
+			rank: 6
 		});
 		dataSet.set("Lexington Av / 59 St", {
 			name: "Lexington Av / 59 St",
 			lines: ["4", "5", "6", "n", "w", "r"],
-			ridership: 17888188
+			ridership: 17888188,
+			rank: 3
 		});
 		dataSet.set("86 St", {
 			name: "86 St",
 			lines: ["4", "5", "6"],
-			ridership: 14277369
+			ridership: 14277369,
+			rank: 0
 		});
 		dataSet.set("Lexington Av-53 St", {
 			name: "Lexington Av-53 St",
 			lines: ["e", "m", "6"],
-			ridership: 18940774
+			ridership: 18940774,
+			rank: 5
 		});
 		dataSet.set("Flushing-Main St", {
 			name: "Flushing-Main St",
 			lines: ["7"],
-			ridership: 18746832
+			ridership: 18746832,
+			rank: 4
 		});
 		dataSet.set("47-50 Sts-Rockefeller Center", {
 			name: "47-50 Sts-Rockefeller Center",
 			lines: ["b", "d", "f", "m"],
-			ridership: 17471620
+			ridership: 17471620,
+			rank: 2
 		});
 		dataSet.set("74-Bway/Jackson Hts-Roosevelt Av", {
 			name: "74-Bway/Jackson Hts-Roosevelt Av",
 			lines: ["e"],
-			ridership: 17095073
+			ridership: 17095073,
+			rank: 1
 		});
+
+		// Put stations into sorted array to check for locking adjacent stations later
+		dataSet.forEach(function(value, key, map) {
+			sortedSet.push(map.get(key));
+		});
+		sortedSet.sort(function(a, b) {return a.ridership - b.ridership;});
 	};
 	function returnClassNameFromLineName( lineName ) {
 		// the line names don't line up with the css for their color
@@ -226,7 +279,7 @@ var gameModule = (function () {
 		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
 		*/
 	  
-		// Check for game win/lose events
+		// Check for game start/win/lose events
         if(swipedStation == "Subway Riders") {
             changeDisplayCard(getRandomStationName());
             return;
@@ -338,24 +391,51 @@ var gameModule = (function () {
             newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
         }
         else {
-            var added = false;
             var stationOrdChildren = gameModule.stationOrd.children;  
             // Cycle through stationOrd to find correct rank
             for (let chi of stationOrdChildren) {
+				var added = false;
                 var chiName = chi.getElementsByClassName("stationOrder__station--label")[0].innerText;
-                var chiRiders = displayedStations.get(chiName).ridership;
-                var addRiders = dataSet.get(stationToAdd).ridership;
-                
-                if (addRiders < chiRiders) {
-                    newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
-                    added = true;
-                    break;
-                }
-            }
-            if(added == false) {
-                newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
-            } 
-        }
+				var chiRiders = displayedStations.get(chiName).ridership;
+				var chiRank = displayedStations.get(chiName).rank;
+				var addRiders = dataSet.get(stationToAdd).ridership;
+				var addRank = dataSet.get(stationToAdd).rank;
+				if(chi.nextElementSibling != null) {
+					var nextStation = chi.nextElementSibling;
+ 					var nextRank = displayedStations.get(nextStation.getElementsByClassName("stationOrder__station--label")[0].innerText).rank;
+				}
+				else nextRank = -9;
+
+				// Left of current
+				if(addRank < chiRank) {
+					newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
+					// Directly left of current
+					if (addRank == chiRank - 1) {
+						chi.classList.add('lockedLeft');
+						newStation.classList.add('lockedRight');
+					}
+					added = true;
+					break;
+				}
+				// Directly right of current
+				else if (addRank == chiRank + 1) {
+					newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi.nextElementSibling)
+					chi.classList.add('lockedRight');
+					newStation.classList.add('lockedLeft');
+					// Check next station ahead for locking purposes
+					if(addRank == nextRank - 1) {
+						newStation.classList.add('lockedRight');
+						nextStation.classList.add('lockedLeft');
+					}
+					added = true;
+					break;
+				}
+			} 
+			// Right of last station, but not directly
+			if(added == false) {
+				newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
+			}
+		}
         
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
@@ -391,7 +471,7 @@ var gameModule = (function () {
 				}
 			}    
 		} 
-        // if you tapped on a station, stationToLock should already be set
+		// if you tapped on a station, stationToLock should already be set
 
 		// Reset gameModule.selectedStation
 		if(gameModule.getSelectedStation() != null) {
@@ -440,6 +520,7 @@ var gameModule = (function () {
 		gameModule.displayCard.appendChild(temp.content);
 
 		addToBottomScroll(startingStation);
+		lockBottomScroll();
     }
     function displayLoseScreen (stationArray) {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
@@ -456,10 +537,7 @@ var gameModule = (function () {
         // it's less hacky to create a temporary dom element than use a hidden one
 		var _html = "<hr><h1 class='displayCard__title'>Game Over</h1><br><br>";
 		_html += "The correct placement of " + currentSelected + " is shown below.<br>"
-// _html += "Correct order:<br>";
-// for (station of stationArray) {
-// 	_html += "<span>" + station.name + "</span><br>  ";
-// }
+
 		_html += "<br><h3>Swipe here to play again.</h3>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); 
@@ -535,10 +613,11 @@ var gameModule = (function () {
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
 
-			    	// did you swipe long enough to check the card?
-			    	if (percentageOfMove > completePercentage) {
+					// did you swipe long enough to check the card?
+		console.log(('lockedRight' in gameModule.selectedStation.classList));
+			    	if (percentageOfMove > completePercentage && !('lockedRight' in gameModule.selectedStation.classList)) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    	} else if (percentageOfMove < -completePercentage) {
+			    	} else if (percentageOfMove < -completePercentage && !('lockedLeft' in gameModule.selectedStation.classList)) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
 			    	}
 
@@ -559,7 +638,7 @@ var gameModule = (function () {
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear existing stations to start fresh
-            gameModule.stationOrd.innerHTML = "";
+            gameModule.stationOrd.innerHTML = '';
             gameModule.stationOrd.style.left = "0px";
             document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
             

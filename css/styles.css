@@ -100,11 +100,11 @@ body {
   font-size: 3em;
   top: 3.25vw;
 }
-.stationOrder__station.lockedRight {
+.stationOrder__station.lockedMore {
   margin-right: -0.5vw;
   border-right: solid gold 1vw;
 }
-.stationOrder__station.lockedLeft {
+.stationOrder__station.lockedLess {
   margin-left: -0.5vw;
   border-left: solid gold 1vw;
 }

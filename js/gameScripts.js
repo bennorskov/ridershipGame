@@ -99,7 +99,6 @@ var gameModule = (function () {
         console.log("--tap:\n" + parseInt(gameModule.bottomScrollContainer.touchStartX / (screenWidth/3)));
 	};
 	function buildStation() {
-
 	};
 	function scrapeFile(input) {
 		const file = input.target.files[0];
@@ -411,8 +410,8 @@ var gameModule = (function () {
 					newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi);
 					// Directly left of current
 					if (addRank == chiRank - 1) {
-						chi.classList.add('lockedLeft');
-						newStation.classList.add('lockedRight');
+						chi.classList.add('lockedLess');
+						newStation.classList.add('lockedMore');
 					}
 					added = true;
 					break;
@@ -420,12 +419,12 @@ var gameModule = (function () {
 				// Directly right of current
 				else if (addRank == chiRank + 1) {
 					newStation = gameModule.stationOrd.insertBefore(temp.content.firstChild, chi.nextElementSibling)
-					chi.classList.add('lockedRight');
-					newStation.classList.add('lockedLeft');
+					chi.classList.add('lockedMore');
+					newStation.classList.add('lockedLess');
 					// Check next station ahead for locking purposes
 					if(addRank == nextRank - 1) {
-						newStation.classList.add('lockedRight');
-						nextStation.classList.add('lockedLeft');
+						newStation.classList.add('lockedMore');
+						nextStation.classList.add('lockedLess');
 					}
 					added = true;
 					break;
@@ -613,11 +612,10 @@ var gameModule = (function () {
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
 
-					// did you swipe long enough to check the card?
-		console.log(('lockedRight' in gameModule.selectedStation.classList));
-			    	if (percentageOfMove > completePercentage && !('lockedRight' in gameModule.selectedStation.classList)) {
+					// did you swipe long enough to check the card, and is the swipe direction locked?
+			    	if (percentageOfMove > completePercentage && !(gameModule.selectedStation.classList.contains('lockedMore'))) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    	} else if (percentageOfMove < -completePercentage && !('lockedLeft' in gameModule.selectedStation.classList)) {
+			    	} else if (percentageOfMove < -completePercentage && !(gameModule.selectedStation.classList.contains('lockedLess'))) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
 			    	}
 

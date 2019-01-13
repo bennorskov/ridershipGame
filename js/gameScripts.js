@@ -81,11 +81,11 @@ var gameModule = (function () {
         var stationToLock = null;
         if (selected != null) {
             // Select left station
-            if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .3) {
+            if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .4) {
                 stationToLock = selected.previousElementSibling;
             }
             // Select right station
-            else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .7) {
+            else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .6) {
                 stationToLock = selected.nextElementSibling;
             }
             else { stationToLock = selected; }
@@ -279,7 +279,10 @@ var gameModule = (function () {
 		*/
 	  
 		// Check for game start/win/lose events
-        if(swipedStation == "Subway Riders") {
+		if(swipedStation == "Game Over" || swipedStation == "You Win") {
+            gameModule.init()
+			return;
+		} else if (swipedStation == "Subway Riders") {
             changeDisplayCard(getRandomStationName());
             return;
         } else if(gameModule.getSelectedStation() == null) {
@@ -290,11 +293,15 @@ var gameModule = (function () {
             afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
 			afBottom.on('tap', onTapBottomScrollContainer);
             return;    
-        } else if(swipedStation == "Game Over" || swipedStation == "You Win") {
-            gameModule.init()
-            return;
-        } 
-        
+        }
+
+		// Check for locked adjacent stations 
+		if((direction == 1) && gameModule.selectedStation.classList.contains('lockedMore')) {
+			return;
+		} else if((direction == -1) && gameModule.selectedStation.classList.contains('lockedLess')) {
+			return;
+		}
+
 		// store stations in "card" and "selected" then compare
 		var card = dataSet.get(swipedStation);
 		var selected = displayedStations.get(gameModule.getSelectedStation().getElementsByClassName("stationOrder__station--label")[0].innerText);
@@ -613,9 +620,9 @@ var gameModule = (function () {
 			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
 
 					// did you swipe long enough to check the card, and is the swipe direction locked?
-			    	if (percentageOfMove > completePercentage && !(gameModule.selectedStation.classList.contains('lockedMore'))) {
+			    	if (percentageOfMove > completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
-			    	} else if (percentageOfMove < -completePercentage && !(gameModule.selectedStation.classList.contains('lockedLess'))) {
+			    	} else if (percentageOfMove < -completePercentage) {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
 			    	}
 

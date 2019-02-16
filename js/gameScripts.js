@@ -357,7 +357,7 @@ var gameModule = (function () {
 		}
 	}
 	function getRandomStationName() {
-		// find a random station name from all station names not yet added
+		// find a random station name from all station names not yet added to bottom of the screen
 		var keyArray = Array.from(dataSet.keys());
 
 		return keyArray[ Math.floor(keyArray.length * Math.random()) ];

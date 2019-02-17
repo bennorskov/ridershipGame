@@ -516,11 +516,10 @@ var gameModule = (function () {
         // Display instructions
         // it's less hacky to create a temporary dom element than use a hidden one
 		var _html = "<hr><h1 class='displayCard__title'>Subway Riders</h1>";
-		_html += "<p>Rank stations in order of annual ridership.</p><br>"
-		_html += "<p><-----Swipe this station sign left if it has fewer riders than " + startingStation + ".</p><br>";
-		_html += "<p align='right'>----->Swipe right if it has more riders than " + startingStation + ".</p><br>";
-		_html += "<p>Scroll along the bottom to select a different station. ";
-		_html += "Swipe either direction to start.</p>"
+		_html += "<p>Rank stations in order of how many folks use them.</p><br>"
+		_html += "<p>Swipe this station sign left or right if you want to see more stations</p><br>";
+		_html += "<p>Swipe down to start.</p><br>";
+		_html += "<p>Scroll along the bottom to select a different station. </p>";
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);
@@ -579,6 +578,8 @@ var gameModule = (function () {
 		stationOrd: "",
         bottomScrollContainer: "",
 		selectedStation: null,
+		maxMoveX: 100,
+		maxMoveY: 200,
 		setupSwipeEvent: function () {
 			// ————— ————— ————— ————— set up swipe event for bottom container
             afBottom = new AlloyFinger(this.bottomScrollContainer, {
@@ -592,32 +593,50 @@ var gameModule = (function () {
 			Transform(this.displayCard);
 			afDisplay = new AlloyFinger(this.displayCard, {
 			    pressMove:function(evt){
-			    	var maxMove = 100;
-                    if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMove) {
+			    	// pressMove only updates the display of the station card.
+			    	// all checks to see if it was swiped down enough happen in touchEnd()
+			    	var maxMoveX = gameModule.maxMoveX;
+			        var maxMoveY = gameModule.maxMoveY;
+
+			    	// limit amount of movement on the x axis
+                    if ( Math.abs(gameModule.displayCard.translateX + evt.deltaX) <= maxMoveX) {
 			        	gameModule.displayCard.translateX += evt.deltaX;
 			        } else {
 			        	if (gameModule.displayCard.translateX < 0) 
-                            gameModule.displayCard.translateX = -maxMove;
+                            gameModule.displayCard.translateX = -maxMoveX;
 			        	if (gameModule.displayCard.translateX > 0) 
-                            gameModule.displayCard.translateX = maxMove;
+                            gameModule.displayCard.translateX = maxMoveX;
+			        }
+
+			        // limit amount of movement on the Y axis
+			        if ( Math.abs(gameModule.displayCard.translateY + evt.deltaY) <= maxMoveY) {
+				    	gameModule.displayCard.translateY += evt.deltaY;
+			        } else {
+			        	if (gameModule.displayCard.translateY < 0) 
+                            gameModule.displayCard.translateY = -maxMoveY;
+			        	if (gameModule.displayCard.translateY > 0) 
+                            gameModule.displayCard.translateY = maxMoveY;
 			        }
 			        evt.preventDefault();
 
-			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
-			    	var xRotationMax = 10,
-			    		yRotationMax = 20,
+
+			        // swipe rotation movement limits
+			    	var percentageOfMoveX = gameModule.displayCard.translateX/maxMoveX;
+			    	var percentageOfMoveY = gameModule.displayCard.translateY/maxMoveY;
+			    	var xRotationMax = 20,
+				        yRotationMax = 20,
 			    		zRotationMax = 10;
-			    	gameModule.displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
-			    	gameModule.displayCard.rotateY = percentageOfMove * yRotationMax;
-			    	gameModule.displayCard.rotateZ = percentageOfMove * zRotationMax;
+			    	gameModule.displayCard.rotateX = percentageOfMoveY * xRotationMax;
+			    	gameModule.displayCard.rotateY = percentageOfMoveX * yRotationMax;
+			    	gameModule.displayCard.rotateZ = percentageOfMoveX * zRotationMax;
 			    },
 			    // Either: Check to see if the card should add, 
 			    // OR: Put the card back into place
 			    touchEnd: function() {
-			    	// touchEnd is a function from Alloy. It's when your finger lifts 
-			    	var maxMove = 100;
+			    	// When your finger leaves the station display card
+			    	var maxMove = gameModule.maxMoveY;
 			    	var completePercentage = .85;
-			    	var percentageOfMove = gameModule.displayCard.translateX/maxMove;
+			    	var percentageOfMove = gameModule.displayCard.translateY/maxMove;
 
 					// did you swipe long enough to check the card, and is the swipe direction locked?
 			    	if (percentageOfMove > completePercentage) {
@@ -626,6 +645,7 @@ var gameModule = (function () {
 			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
 			    	}
 
+			    	// turn on animations to put the card back
 			    	gameModule.animateDisplayCard = true;
 			    	gameModule.animate();
 			    }
@@ -670,20 +690,24 @@ var gameModule = (function () {
 			*	and animate will call itself until flags are false. 
 			*/
 			if (gameModule.animateDisplayCard) {
-		    	var maxMove = 100;
+		    	var maxMoveX = gameModule.maxMoveX;
+		        var maxMoveY = gameModule.maxMoveY;
 		    	var xRotationMax = 10,
 		    		yRotationMax = 20,
 		    		zRotationMax = 10;
 		    	var easeAmount = .55;
 		    	gameModule.displayCard.translateX += (0 - gameModule.displayCard.translateX) * easeAmount;
-		    	var percentageOfMove = gameModule.displayCard.translateX/maxMove; // calculate after movement for rotation
-		    	gameModule.displayCard.rotateX = Math.abs(percentageOfMove) * xRotationMax;
-		    	gameModule.displayCard.rotateY = percentageOfMove * yRotationMax;
-		    	gameModule.displayCard.rotateZ = percentageOfMove * zRotationMax;
+		    	gameModule.displayCard.translateY += (0 - gameModule.displayCard.translateY) * easeAmount;
+		    	var percentageOfMoveX = gameModule.displayCard.translateX/maxMoveX; // calculate after movement for rotation
+		    	var percentageOfMoveY = gameModule.displayCard.translateY/maxMoveY;
+		    	gameModule.displayCard.rotateX = percentageOfMoveY * xRotationMax;
+		    	gameModule.displayCard.rotateY = percentageOfMoveX * yRotationMax;
+		    	gameModule.displayCard.rotateZ = percentageOfMoveX * zRotationMax;
 		    	// end and reset the animation if you're close enough
-		    	if (Math.abs(percentageOfMove) < .05) {
+		    	if ( (Math.abs(percentageOfMoveX) + Math.abs(percentageOfMoveY)) < .1) {
 		    		gameModule.animateDisplayCard = false;
 			    	gameModule.displayCard.translateX = 0;
+			    	gameModule.displayCard.translateY = 0;
 			    	gameModule.displayCard.rotateX = 0;
 			    	gameModule.displayCard.rotateY = 0;
 			    	gameModule.displayCard.rotateZ = 0;

@@ -27,6 +27,7 @@ var gameModule = (function () {
 	var displayedStations = new Map();
     var afBottom;
 	var afDisplay;
+	var touchEvent = '';
 	// Station Object
 	class station {
 		constructor(options) {
@@ -36,6 +37,7 @@ var gameModule = (function () {
 		};
 	};
 	var onTouchStartBottomScrollContainer = function(evt) { 
+		gameModule.touchEvent = '';
 		// Get x location of finger press to use in tap events
 		gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
 		evt.preventDefault();
@@ -43,8 +45,18 @@ var gameModule = (function () {
 		console.log('00000-----New Event-----00000');
 	};
 	var onPressMoveBottomScrollContainer = function(evt) {
+		console.log('--pressMove');
 		// Skip function if animation already underway
 		if (gameModule.animateBottomScroll == true) { return; }
+		// Ignore tiny swipes. One-millionth of width seems to work decently across sizes.
+		var tinyWidth = window.screen.width * .0001; 
+		if (Math.abs(evt.deltaX) < tinyWidth) {
+			console.log('Tiny swipe ignored.')
+			return;
+		}
+
+		gameModule.touchEvent = 'PressMove';
+
 		// Move stationOrd element along x axis
 		var screenMiddle = window.screen.width * .5;
 		var curLeft = gameModule.stationOrd.offsetLeft;
@@ -67,15 +79,20 @@ var gameModule = (function () {
 	};
 	var onTouchEndBottomScrollContainer = function() {
 		// Skip function if animation already underway
-		if (gameModule.animateBottomScroll == false) {
+		if (gameModule.animateBottomScroll == false && gameModule.touchEvent == 'PressMove') {
 			lockBottomScroll( null, true );
 		}
 		
 		console.log('touchEnd');
 	};
     var onTapBottomScrollContainer = function() {
+		console.log("--tap: " + parseInt(gameModule.bottomScrollContainer.touchStartX / (window.screen.width/3)));
+
         // Skip function if animation already underway
-        if (gameModule.animateBottomScroll == true) { return; }
+		if (gameModule.animateBottomScroll == true) { return; }
+		
+		gameModule.touchEvent = 'Tap';
+
         var screenWidth = window.screen.width;
         var selected = document.getElementsByClassName("selectedStation")[0] || null;
         var stationToLock = null;
@@ -89,15 +106,30 @@ var gameModule = (function () {
                 stationToLock = selected.nextElementSibling;
             }
             else { stationToLock = selected; }
-            // Remove previous selection and lock on new selection    
-            if(stationToLock != null) {            
+            // If new selection, remove previous selection and lock on new selection
+            if(stationToLock != selected && stationToLock != null) {       
                 // Lock on newly selected station
                 lockBottomScroll(stationToLock, true);
             }
         }
-
-        console.log("--tap:\n" + parseInt(gameModule.bottomScrollContainer.touchStartX / (screenWidth/3)));
 	};
+	var onDoubleTapBottomScrollContainer = function() {
+		console.log('Doubletap');
+		gameModule.touchEvent = 'DoubleTap';
+
+	};
+	var onLongTapBottomScrollContainer = function() {
+		console.log('Longtap');
+		gameModule.touchEvent = 'LongTap';		
+	};
+	var onMultipointStart = function () { };
+	var onMultipointEnd =  function () { };
+	var onSingleTap = function () { };
+	var onSwipe = function () { };
+	var onPinch = function () { };
+	var onRotate = function () { };
+	var onTouchMove = function () { };
+	var onTouchCancel = function () { };
 	function buildStation() {
 	};
 	function scrapeFile(input) {
@@ -585,7 +617,17 @@ var gameModule = (function () {
                 touchStart: onTouchStartBottomScrollContainer,
 				pressMove: onPressMoveBottomScrollContainer, 
 				touchEnd: onTouchEndBottomScrollContainer, 
-                tap: onTapBottomScrollContainer
+				tap: onTapBottomScrollContainer,
+				doubleTap: onDoubleTapBottomScrollContainer,
+				longTap: onLongTapBottomScrollContainer,
+				singleTap: onSingleTap,
+				touchMove: onTouchMove,
+				touchCancel: onTouchCancel,
+				rotate: onRotate,
+				pinch: onPinch,
+				swipe: onSwipe,
+				multipointStart: onMultipointStart,
+				multipointEnd: onMultipointEnd
 			});
 
 			// ————— ————— ————— ————— set up swipe event for main card
@@ -655,10 +697,18 @@ var gameModule = (function () {
                 start = false;
                 gameModule.setupSwipeEvent();
             }
-            // afBottom.off('touchStart', onTouchStartBottomScrollContainer);
-            // afBottom.off('pressMove', onPressMoveBottomScrollContainer);
-            // afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
-            // afBottom.off('tap', onTapBottomScrollContainer);
+
+			// Turn off unused touch events for bottom scroll container
+			afBottom.off('doubleTap', onDoubleTapBottomScrollContainer);
+			afBottom.off('longTap', onLongTapBottomScrollContainer)
+			afBottom.off('singleTap', onSingleTap);
+			afBottom.off('touchMove', onTouchMove);
+			afBottom.off('touchCancel', onTouchCancel);
+			afBottom.off('rotate', onRotate);
+			afBottom.off('pinch', onPinch);
+			afBottom.off('swipe', onSwipe);
+			afBottom.off('multipointStart', onMultipointStart);
+			afBottom.off('multipointEnd', onMultipointEnd);
 		},
 		// ———— ———— animation flags:
 		animateDisplayCard: false,

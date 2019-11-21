@@ -272,6 +272,7 @@ var gameModule = (function () {
 		return _html;
 	}
 	function checkSwipeVsSelected( swipedStation, direction ) {
+		// Will be DEPRECIATED for Swipe Down.
 		/* 
 		*	check the displayCard vs the selectedStation. 
 		*	swipedStation is a string
@@ -390,7 +391,7 @@ var gameModule = (function () {
 
 		// it's less hacky to create a temporary dom element than use a hidden one
 		var temp = document.createElement("template");
-		temp.innerHTML = _html.trim(); // remove extra whitespace
+		temp.innerHTML = _html.trim(); // add elements and remove extra whitespace
                 
         // Insert stationToAdd into stationOrder in correct ranking of ridership
         if(gameModule.getSelectedStation() == null) {

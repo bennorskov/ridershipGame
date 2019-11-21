@@ -1,49 +1,17 @@
 /*
-Error: Undefined variable: "$mtaGrey".
-        on line 14 of sass/stationOrder.sass
+Error: Undefined variable: "$mtaWater".
+        on line 4 of sass/waterBg.sass
 
-9:     right: 0
-10:     top: 0
-11:     @at-root #{&}__bgBar
-12:         height: 100%
-13:         width: 3%
-14:         background: $mtaGrey
-15:         margin: 0 21%
-16:         border-left: 1px #555 solid
-17:         border-right: 1px #666 solid
-18:     .stationOrder
-19:         width: 100%
+1: .waterBg
+2: 	width: 30vw
+3: 	height: 100vh
+4: 	background: $mtaWater
 
 Backtrace:
-sass/stationOrder.sass:14
+sass/waterBg.sass:4
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/script/tree/variable.rb:49:in `_perform'
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/script/tree/node.rb:58:in `perform'
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:398:in `visit_prop'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:36:in `visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:162:in `block in visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:79:in `block in with_base'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:115:in `with_frame'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:79:in `with_base'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:162:in `visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:434:in `block (2 levels) in visit_rule'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:434:in `map'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:434:in `block in visit_rule'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:183:in `with_environment'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:432:in `visit_rule'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:36:in `visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:162:in `block in visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:79:in `block in with_base'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:115:in `with_frame'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:79:in `with_base'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:162:in `visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:52:in `map'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:52:in `visit_children'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:171:in `block in visit_children'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:183:in `with_environment'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:170:in `visit_children'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:36:in `block in visit'
-/Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:457:in `visit_atroot'
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/base.rb:36:in `visit'
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/tree/visitors/perform.rb:162:in `block in visit'
 /Users/z/.rvm/gems/ruby-2.2.7/gems/sass-3.4.25/lib/sass/stack.rb:79:in `block in with_base'
@@ -93,4 +61,4 @@ sass/stationOrder.sass:14
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: Undefined variable: \"$mtaGrey\".\A         on line 14 of sass/stationOrder.sass\A \A 9:     right: 0\A 10:     top: 0\A 11:     @at-root #{&}__bgBar\A 12:         height: 100%\A 13:         width: 3%\A 14:         background: $mtaGrey\A 15:         margin: 0 21%\A 16:         border-left: 1px #555 solid\A 17:         border-right: 1px #666 solid\A 18:     .stationOrder\A 19:         width: 100%"; }
+  content: "Error: Undefined variable: \"$mtaWater\".\A         on line 4 of sass/waterBg.sass\A \A 1: .waterBg\A 2: 	width: 30vw\A 3: 	height: 100vh\A 4: 	background: $mtaWater"; }

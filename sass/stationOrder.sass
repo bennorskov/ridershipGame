@@ -1,5 +1,6 @@
 $stationWidth: 3vw
 $stationMargin: $stationWidth/2 + 1
+$stationTransitionTime: .2s
 .rightStationHolder
     position: absolute
     width: 40vw
@@ -16,11 +17,12 @@ $stationMargin: $stationWidth/2 + 1
         border-right: 1px #666 solid
     .stationOrder
         width: 100%
-        top: 0
+        top: $startingTopOffset
         position: absolute
         padding-left: 16%
+        transition: top $stationTransitionTime
         @at-root #{&}__station
-            transition: all .2s
+            transition: all $stationTransitionTime
             border-radius: $stationMargin
             border: solid black 1vw
             width: $stationWidth
@@ -64,14 +66,6 @@ $stationMargin: $stationWidth/2 + 1
             background: white
             opacity: .8
             position: absolute
-            top: 50%
+            top: $startingTopOffset
             margin-left: 5vw
-        @at-root #{&}__selectedStationLabel
-            font-size: 2em
-            position: fixed
-            bottom: 5vh
-            margin: auto
-            width: 100%
-            text-align: center
-            color: white
 

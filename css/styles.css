@@ -9,37 +9,48 @@
 body {
   background: #efe8d5; }
 
-.displayCardHolder {
-  width: 80vw;
+.displayCardTouchContainer {
+  width: 100vw;
   height: 100vh;
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 100;
-  display: none; }
-
-.displayCard {
-  width: 70vw;
-  margin: 5vh auto;
-  background: black;
-  color: white;
-  padding: 2em; }
-  .displayCard__title {
-    font-size: 2em; }
-  .displayCard__lines {
-    font-size: 1.3em; }
-    .displayCard__lines--circle {
-      width: 1.7em;
-      height: 1.7em;
-      margin-top: 0.5em;
-      border-radius: 1em;
-      text-align: center;
-      line-height: 1.8em;
-      font-weight: bold;
-      font-size: 1.2em;
-      vertical-align: middle;
-      color: white;
-      display: inline-block; }
+  z-index: 100; }
+  .displayCardTouchContainer .displayStationCircle {
+    width: 35vw;
+    height: 35vw;
+    border-radius: 35vw;
+    position: absolute;
+    background: #fffd38;
+    top: 35%;
+    left: 17.5vw;
+    margin-top: -14vw;
+    color: #272727;
+    line-height: 35vw;
+    font-size: 3em;
+    text-align: center; }
+  .displayCardTouchContainer .displayCard {
+    position: relative;
+    width: 75vw;
+    margin: 70vh auto 0 auto;
+    background: black;
+    color: white;
+    padding: 1em; }
+    .displayCardTouchContainer .displayCard__title {
+      font-size: 1.4em; }
+    .displayCardTouchContainer .displayCard__lines {
+      font-size: 0.7em; }
+      .displayCardTouchContainer .displayCard__lines--circle {
+        width: 2em;
+        height: 2em;
+        margin-top: 0.5em;
+        border-radius: 1em;
+        text-align: center;
+        line-height: 2em;
+        font-weight: bold;
+        font-size: 1.4em;
+        vertical-align: middle;
+        display: inline-block; }
 
 .rightStationHolder {
   position: absolute;
@@ -57,9 +68,10 @@ body {
     border-right: 1px #666 solid; }
   .rightStationHolder .stationOrder {
     width: 100%;
-    top: 0;
+    top: 35%;
     position: absolute;
-    padding-left: 16%; }
+    padding-left: 16%;
+    transition: top 0.2s; }
     .rightStationHolder .stationOrder__station {
       transition: all 0.2s;
       border-radius: 2.5vw;
@@ -105,16 +117,8 @@ body {
       background: white;
       opacity: 0.8;
       position: absolute;
-      top: 50%;
+      top: 35%;
       margin-left: 5vw; }
-    .rightStationHolder .stationOrder__selectedStationLabel {
-      font-size: 2em;
-      position: fixed;
-      bottom: 5vh;
-      margin: auto;
-      width: 100%;
-      text-align: center;
-      color: white; }
 
 .fourfivesix {
   background: #139240; }
@@ -146,5 +150,10 @@ body {
 
 .g {
   background: #6ebd4c; }
+
+.waterBg {
+  width: 30vw;
+  height: 100vh;
+  background: #acc9e9; }
 
 /*# sourceMappingURL=styles.css.map */

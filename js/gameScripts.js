@@ -249,54 +249,55 @@ var gameModule = (function () {
 		*/
 	  
 		// Check for game start/win/lose events
-		if(swipedStation == "Game Over" || swipedStation == "You Win") {
-            gameModule.init()
-			return;
-		} else if (swipedStation == "Subway Riders") {
-            changeDisplayCard(getRandomStationName());
-            return;
-        } else if(gameModule.getStationWithSpace() == null) {
-			addToRightSide(swipedStation);
-			changeDisplayCard( getRandomStationName() );
-            return;    
-        }
+			if(swipedStation == "Game Over" || swipedStation == "You Win") {
+	            gameModule.init()
+				return;
+			} else if (swipedStation == "Subway Riders") {
+	            changeDisplayCard(getRandomStationName());
+	            return;
+	        } else if(gameModule.getStationWithSpace() == null && displayedStations.size == 0) {
+				addToRightSide(swipedStation);
+				changeDisplayCard( getRandomStationName() );
+	            return;    
+	        }
 
-		/* Check for locked adjacent stations 
-		if((direction == 1) && gameModule.selectedStation.classList.contains('lockedMore')) {
-			return;
-		} else if((direction == -1) && gameModule.selectedStation.classList.contains('lockedLess')) {
-			return;
-		}*/
+		// store stations in "currentStationData" then compare
 
-		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
-		// -————————–------————— TEST CODE TO ALWAYS ADD STATION\
-					addToRightSide(swipedStation);
-					return;
-		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
-		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
-		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
+/* 
 
-		// store stations in "card" and "selected" then compare
+			THIS PART RIGHT HERE NEEDS WORK
+
+
+
+
+*/
+
 		var currentStationData = dataSet.get(swipedStation);
-		var selected = displayedStations.get(gameModule.getStationWithSpace().getElementsByClassName("stationOrder__station--label")[0].innerText);
-		var rightStation = gameModule.getStationWithSpace().nextElementSibling;
-		if (rightStation != null) {
-			rightStation = displayedStations.get(rightStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
+		var bottomStationRidership, topStationRidership;
+		bottomStationRidership = gameModule.getStationWithSpace();
+		if (bottomStationRidership == undefined) {
+			bottomStationRidership = 0; // dummy value for when the right side has only one station in it
+			topStationRidership = displayedStations.get("gameModule.stationOrd.lastElementChild.innerText").ridership;
+			// above line is last station currently displayed. 
+		} else {
+			bottomStationRidership = displayedStations.get(bottomStationRidership.getElementsByClassName("stationOrder__station--label")[0].innerText).ridership;
+			topStationRidership = gameModule.getStationWithSpace().previousElementSibling;
+			if (topStationRidership != null) {
+				topStationRidership = displayedStations.get(topStationRidership.getElementsByClassName("stationOrder__station--label")[0].innerText).ridership;
+			} else {
+				topStationRidership = 999999999; // make a "dummy" top station that everything is less than
+			}
 		}
-		var leftStation = gameModule.getStationWithSpace().previousElementSibling;
-		if (leftStation != null) {
-			leftStation = displayedStations.get(leftStation.getElementsByClassName("stationOrder__station--label")[0].innerText);
-		}
-
-        // more temporary test code to help with comparisons
-        console.log(currentStationData.ridership + ": " + currentStationData.name + "\n" + selected.ridership + ": " + selected.name);
-        // end test code
+		
+        console.log("Numbers: " + currentStationData.ridership + ": " + currentStationData.name + "\n" + bottomStationRidership + " < bottom | top => " + topStationRidership);
         
-		//	Need to check against selected and adjacent stations
-		if (currentStationData.ridership) {
+		//	Need to check against spaceStation and topSTation
+		if (currentStationData.ridership > bottomStationRidership && currentStationData.ridership < topStationRidership) {
 			addToRightSide(swipedStation);
 		} else {  
-            displayLoseScreen([currentStationData, selected]);
+			console.log ("YOU LOST!");
+			return;
+            displayLoseScreen([currentStationData, spaceStation]);
             return;
         }
         
@@ -304,8 +305,7 @@ var gameModule = (function () {
         if(dataSet.size < 1) {
             console.log('dataSet is empty! You Win!');
             displayWinScreen();
-		}
-		else {
+		} else {
 			changeDisplayCard( getRandomStationName() );			
 		}
 	}
@@ -316,9 +316,7 @@ var gameModule = (function () {
 		return keyArray[ Math.floor(keyArray.length * Math.random()) ];
 	}
 	function changeDisplayCard( stationName ) {
-		// change the displayCard of the main circle
-		console.log("adding " + stationName + " card");
-        
+		// change the displayCard of the main circle        
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
 		_html += "<div class='displayCard__lines'>";
 
@@ -328,7 +326,6 @@ var gameModule = (function () {
 			_html += addLineToDisplayCard(lines[i]) + " ";
 		};
 		_html += "</div>";
-		console.log(lines[0]);
 		gameModule.displayCard.innerHTML = _html;
 		changeDisplayCircle(lines[0]);		
 	}
@@ -342,7 +339,6 @@ var gameModule = (function () {
 		// Future Polish: make the displayCricle slowly cycle through all the stations
 	}
 	function addToRightSide( stationToAdd ) {   
-		console.log("Trying to add " + stationToAdd);     
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
@@ -357,7 +353,7 @@ var gameModule = (function () {
 		temp.innerHTML = _html.trim(); // add elements and remove extra whitespace
                 
         var spaceStation = gameModule.getStationWithSpace();
-        // Insert stationToAdd into stationOrder in correct ranking of ridership
+        // Insert stationToAdd into stationOrder based on current space
         if(spaceStation == null) {
             newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
             newStation.classList.add("extraSpace");
@@ -413,9 +409,6 @@ var gameModule = (function () {
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
         dataSet.delete(stationToAdd);  
-        
-		console.log("addToRightSide:\n--" + stationToAdd);
-
 		return newStation;
 	}
     function displayStartScreen () {
@@ -424,7 +417,18 @@ var gameModule = (function () {
 		gameModule.displayCard.innerHTML = "";
 
 		changeDisplayCard(getRandomStationName());
+
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
 		return;
+
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
+		// ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----  TEST CODE
 
         // Display instructions
         // it's less hacky to create a temporary dom element than use a hidden one
@@ -478,6 +482,10 @@ var gameModule = (function () {
 		getDataSet: function() {
 			// dataSet is private
 			return dataSet;
+		},
+		getDisplayedStations: function() {
+			// dataSet is private
+			return displayedStations;
 		},
 		getStationWithSpace: function() {
 			// selectedStation is dependent on document state

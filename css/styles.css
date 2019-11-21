@@ -21,11 +21,9 @@ body {
     height: 35vw;
     border-radius: 35vw;
     position: absolute;
-    background: #fffd38;
     top: 35%;
     left: 17.5vw;
     margin-top: -14vw;
-    color: #272727;
     line-height: 35vw;
     font-size: 3em;
     text-align: center; }
@@ -79,7 +77,6 @@ body {
       width: 3vw;
       height: 3vw;
       display: block;
-      background: white;
       margin: 3vw 0; }
       .rightStationHolder .stationOrder__station--label {
         padding-left: 5vw;
@@ -90,7 +87,8 @@ body {
         width: 15vh;
         position: absolute;
         text-align: left;
-        color: #272727; }
+        color: #272727;
+        margin-top: -2px; }
       .rightStationHolder .stationOrder__station.lockedMore {
         margin-right: -0.5vw;
         border-right: solid gold 1vw; }
@@ -121,35 +119,44 @@ body {
       margin-left: 5vw; }
 
 .fourfivesix {
-  background: #139240; }
+  background: #139240;
+  color: white; }
 
 .nqrw {
   background: #fffd38;
-  color: black; }
+  color: #272727; }
 
 .l {
-  background: #999999; }
+  background: #999999;
+  color: white; }
 
 .ace {
-  background: #2b52aa; }
+  background: #2b52aa;
+  color: white; }
 
 .seven {
-  background: #b73aab; }
+  background: #b73aab;
+  color: white; }
 
 .bdfm {
-  background: #f4632a; }
+  background: #f4632a;
+  color: white; }
 
 .onetwothree {
-  background: #ec3836; }
+  background: #ec3836;
+  color: white; }
 
 .jz {
-  background: #986538; }
+  background: #986538;
+  color: white; }
 
 .s {
-  background: #808183; }
+  background: #808183;
+  color: white; }
 
 .g {
-  background: #6ebd4c; }
+  background: #6ebd4c;
+  color: white; }
 
 .waterBg {
   width: 30vw;

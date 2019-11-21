@@ -20,6 +20,7 @@
 *
 */
 var once = true;
+var htmlT = '';
 var gameModule = (function () {
 	// As the game progresses, move stations into displayedStations and delete from dataSet
     var start = true;  // There's probably a better way to do this.    
@@ -35,69 +36,6 @@ var gameModule = (function () {
 			this.lines = options.lines || [];
 			this.ridership = options.ridership || 0;
 		};
-	};
-	var onTouchStartBottomScrollContainer = function(evt) { 
-		// Get x location of finger press to use in tap events
-		gameModule.bottomScrollContainer.touchStartX = evt.touches[0].pageX;
-		evt.preventDefault();
-		
-		console.log('00000-----New Event-----00000');
-	};
-	var onPressMoveBottomScrollContainer = function(evt) {
-		// Skip function if animation already underway
-		if (gameModule.animateBottomScroll == true) { return; }
-		// Move stationOrd element along x axis
-		var screenMiddle = window.screen.width * .5;
-		var curLeft = gameModule.stationOrd.offsetLeft;
-		var newPosition = evt.deltaX + curLeft;
-
-		// If there is a station selected, unselect it while scrolling
-		var selected = document.getElementsByClassName("selectedStation")[0] || null;
-		if (selected != null) {
-			selected.classList.remove("selectedStation");
-			document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-		}
-		// Move stationOrd, restricting it from leaving the screen entirely
-		if(newPosition > screenMiddle) {
-			newPosition = screenMiddle;
-		}
-		else if(newPosition < screenMiddle - gameModule.stationOrd.offsetWidth) {
-			newPosition = screenMiddle - gameModule.stationOrd.offsetWidth;
-		}
-		gameModule.stationOrd.style.left = newPosition + "px";
-	};
-	var onTouchEndBottomScrollContainer = function() {
-		// Skip function if animation already underway
-		if (gameModule.animateBottomScroll == false) {
-			lockBottomScroll( null, true );
-		}
-		
-		console.log('touchEnd');
-	};
-    var onTapBottomScrollContainer = function() {
-        // Skip function if animation already underway
-        if (gameModule.animateBottomScroll == true) { return; }
-        var screenWidth = window.screen.width;
-        var selected = document.getElementsByClassName("selectedStation")[0] || null;
-        var stationToLock = null;
-        if (selected != null) {
-            // Select left station
-            if (gameModule.bottomScrollContainer.touchStartX < screenWidth * .4) {
-                stationToLock = selected.previousElementSibling;
-            }
-            // Select right station
-            else if (gameModule.bottomScrollContainer.touchStartX > screenWidth * .6) {
-                stationToLock = selected.nextElementSibling;
-            }
-            else { stationToLock = selected; }
-            // Remove previous selection and lock on new selection    
-            if(stationToLock != null) {            
-                // Lock on newly selected station
-                lockBottomScroll(stationToLock, true);
-            }
-        }
-
-        console.log("--tap:\n" + parseInt(gameModule.bottomScrollContainer.touchStartX / (screenWidth/3)));
 	};
 	function moveRightBar(direction) {
 		// extraSpace adds margin at the top of a station
@@ -304,12 +242,10 @@ var gameModule = (function () {
 		_html += className + "'>" + lineName.toUpperCase() + "</div>";
 		return _html;
 	}
-	function checkSwipeVsSelected( swipedStation, direction ) {
-		// Will be DEPRECIATED for Swipe Down.
+	function checkSwipeVsSelected( swipedStation ) {
 		/* 
 		*	check the displayCard vs the selectedStation. 
-		*	swipedStation is a string
-		*	direction is a number. > 0 is right swipe. < 0 is left swipe.
+		*	swipedStation is a string of the station name
 		*/
 	  
 		// Check for game start/win/lose events
@@ -320,12 +256,8 @@ var gameModule = (function () {
             changeDisplayCard(getRandomStationName());
             return;
         } else if(gameModule.getStationWithSpace() == null) {
-			addToBottomScroll(swipedStation);
+			addToRightSide(swipedStation);
 			changeDisplayCard( getRandomStationName() );
-			afBottom.on('touchStart', onTouchStartBottomScrollContainer);
-            afBottom.on('pressMove', onPressMoveBottomScrollContainer);
-            afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
-			afBottom.on('tap', onTapBottomScrollContainer);
             return;    
         }
 
@@ -336,8 +268,16 @@ var gameModule = (function () {
 			return;
 		}*/
 
+		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
+		// -————————–------————— TEST CODE TO ALWAYS ADD STATION\
+					addToRightSide(swipedStation);
+					return;
+		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
+		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
+		// -————————–------————— TEST CODE TO ALWAYS ADD STATION
+
 		// store stations in "card" and "selected" then compare
-		var card = dataSet.get(swipedStation);
+		var currentStationData = dataSet.get(swipedStation);
 		var selected = displayedStations.get(gameModule.getStationWithSpace().getElementsByClassName("stationOrder__station--label")[0].innerText);
 		var rightStation = gameModule.getStationWithSpace().nextElementSibling;
 		if (rightStation != null) {
@@ -349,35 +289,14 @@ var gameModule = (function () {
 		}
 
         // more temporary test code to help with comparisons
-        console.log(card.ridership + ": " + card.name + "\n" + selected.ridership + ": " + selected.name);
+        console.log(currentStationData.ridership + ": " + currentStationData.name + "\n" + selected.ridership + ": " + selected.name);
         // end test code
         
 		//	Need to check against selected and adjacent stations
-		if (direction > 0 && selected.ridership < card.ridership) {
-			// Check station to right of selected	
-			if (rightStation == null) {
-				addToBottomScroll(swipedStation);
-			}
-			else if (card.ridership < rightStation.ridership) {
-				addToBottomScroll(swipedStation);	
-			}
-			else {
-				displayLoseScreen([card, selected, rightStation]);
-            	return;
-			}
-		} else if (direction < 0 && card.ridership < selected.ridership) { 
-			// Check station to left of selected
-			if (leftStation == null) {
-				addToBottomScroll(swipedStation);
-			} 
-			else if (leftStation.ridership < card.ridership) {
-				addToBottomScroll(swipedStation);
-			} else {
-				displayLoseScreen([card, selected, leftStation]);
-            	return;
-			}
+		if (currentStationData.ridership) {
+			addToRightSide(swipedStation);
 		} else {  
-            displayLoseScreen([card, selected]);
+            displayLoseScreen([currentStationData, selected]);
             return;
         }
         
@@ -397,7 +316,7 @@ var gameModule = (function () {
 		return keyArray[ Math.floor(keyArray.length * Math.random()) ];
 	}
 	function changeDisplayCard( stationName ) {
-		// change the displayCard that you swipe to test against selectedStation
+		// change the displayCard of the main circle
 		console.log("adding " + stationName + " card");
         
 		var _html = "<hr><h1 class='displayCard__title'>" + stationName + "</h1>";
@@ -409,9 +328,21 @@ var gameModule = (function () {
 			_html += addLineToDisplayCard(lines[i]) + " ";
 		};
 		_html += "</div>";
+		console.log(lines[0]);
 		gameModule.displayCard.innerHTML = _html;
+		changeDisplayCircle(lines[0]);		
 	}
-	function addToBottomScroll( stationToAdd ) {        
+	function changeDisplayCircle(_lineName) {
+		// Change the Display circle contents and color
+		gameModule.displayStationCircle.innerHTML = _lineName.toUpperCase();
+		// only take first class
+		gameModule.displayStationCircle.classList = gameModule.displayStationCircle.classList[0];
+		// add in the correct class name based on the line of that station
+		gameModule.displayStationCircle.classList.add( returnClassNameFromLineName(_lineName) );
+		// Future Polish: make the displayCricle slowly cycle through all the stations
+	}
+	function addToRightSide( stationToAdd ) {   
+		console.log("Trying to add " + stationToAdd);     
 		// grab a random line from the station to use as the display station for the botton bar:
 		var lineName = dataSet.get(stationToAdd).lines[Math.floor(dataSet.get(stationToAdd).lines.length * Math.random())];
 		var className = returnClassNameFromLineName(lineName);
@@ -419,22 +350,24 @@ var gameModule = (function () {
 		
         var _html = "<div class='stationOrder__station " + className + "'>";
 		_html += "<h1 class='stationOrder__station--label'>" + stationToAdd + "</h1>";
-		_html += "<h1 class='stationOrder__station--lineLabel'>"+ lineName.toUpperCase() +"</h1>";
 		_html += "</div>";
 
 		// it's less hacky to create a temporary dom element than use a hidden one
 		var temp = document.createElement("template");
 		temp.innerHTML = _html.trim(); // add elements and remove extra whitespace
                 
+        var spaceStation = gameModule.getStationWithSpace();
         // Insert stationToAdd into stationOrder in correct ranking of ridership
-        if(gameModule.getStationWithSpace() == null) {
+        if(spaceStation == null) {
             newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
-        }
-        else {
-            var stationOrdChildren = gameModule.stationOrd.children;  
+            newStation.classList.add("extraSpace");
+        } else {
+        	gameModule.stationOrd.insertBefore(temp.content.firstChild, spaceStation);
+        	/*
+            var stationOrdChildren = gameModule.stationOrd.children;
             // Cycle through stationOrd to find correct rank
             for (let chi of stationOrdChildren) {
-				var added = false;
+            	var added = false;
                 var chiName = chi.getElementsByClassName("stationOrder__station--label")[0].innerText;
 				var chiRiders = displayedStations.get(chiName).ridership;
 				var chiRank = displayedStations.get(chiName).rank;
@@ -474,78 +407,24 @@ var gameModule = (function () {
 			// Right of last station, but not directly
 			if(added == false) {
 				newStation = gameModule.stationOrd.appendChild(temp.content.firstChild);
-			}
+			}*/
 		}
         
 		// move the station into displayed stations and delete from dataSet
 		displayedStations.set(stationToAdd, dataSet.get(stationToAdd));
         dataSet.delete(stationToAdd);  
-        lockBottomScroll(gameModule.getStationWithSpace(), false);
         
-		console.log("addToBottomScroll:\n--" + stationToAdd);
+		console.log("addToRightSide:\n--" + stationToAdd);
 
 		return newStation;
 	}
-	function lockBottomScroll ( stationToLock=null, animate=false ) {
-        // Skip function if animation already underway
-        if (gameModule.animateBottomScroll == true) { return; }
-        // Skip function if stationOrd is empty
-        var stationOrdChildren = gameModule.stationOrd.children;
-        if (stationOrdChildren.length < 1) {return;}
-		// stationToLock is a dom element or null
-        var screenMiddle = window.screen.width * .5;
-		var sOLeft = gameModule.stationOrd.offsetLeft;
-		
-        // if a swipe, then stationToLock will be null, so we have to find the most middle station
-		if (stationToLock == null || stationToLock == undefined) {
-            //find closest button to center
-			var closestAmount = screenMiddle;
-			// cycle through children until you find the closest child to the center. 
-			// select it
-			for (let chi of stationOrdChildren) {
-				var centerOfStation = chi.offsetLeft + (chi.offsetWidth*.5);
-                var difference = Math.abs(screenMiddle - (centerOfStation + sOLeft));
-				if (difference < closestAmount) {
-					closestAmount = difference;
-					stationToLock = chi;                    
-				}
-			}    
-		} 
-		// if you tapped on a station, stationToLock should already be set
-
-		// Reset gameModule.selectedStation
-		if(gameModule.getStationWithSpace() != null) {
-			gameModule.getStationWithSpace().classList.remove("selectedStation");
-		//	document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = "";
-		}
-		gameModule.selectedStation = stationToLock;        
-		// select station by making it bigger and removing outline
-		stationToLock.classList.add("selectedStation");
-		// set bottom text to station name
-		document.getElementsByClassName("stationOrder__selectedStationLabel")[0].innerText = stationToLock.children[0].innerText;
-
-        // Instantly correct position to lock selected station in middle
-        if(animate == false) {
-            gameModule.stationOrd.style.left = (screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5))) + "px";
-        }
-        // Animate scroll to lock selected station in middle
-        else {
-			afBottom.off('touchStart', onTouchStartBottomScrollContainer);
-            afBottom.off('pressMove', onPressMoveBottomScrollContainer);
-            afBottom.off('touchEnd', onTouchEndBottomScrollContainer);
-			afBottom.off('tap', onTapBottomScrollContainer);
-			gameModule.animateBottomScroll = true;
-            gameModule.animate();
-        }
-        
-        console.log("lockBottomScroll:\n--" + stationToLock.getElementsByClassName('stationOrder__station--label')[0].innerHTML);
-	}
     function displayStartScreen () {
 		var startingStation = getRandomStationName();
-
         gameModule.animateDisplayCircle = false;
-        gameModule.animateBottomScroll = false;
 		gameModule.displayCard.innerHTML = "";
+
+		changeDisplayCard(getRandomStationName());
+		return;
 
         // Display instructions
         // it's less hacky to create a temporary dom element than use a hidden one
@@ -558,17 +437,14 @@ var gameModule = (function () {
 		temp.innerHTML = _html.trim(); // remove extra whitespace
 		gameModule.displayCard.appendChild(temp.content);
 
-		addToBottomScroll(startingStation);
-		lockBottomScroll();
+		addToRightSide(startingStation);
     }
     function displayLoseScreen (stationArray) {
         // This function is called by checkSwipeVsSelected when player answers incorrectly.
         gameModule.animateDisplayCircle = false;
-        gameModule.animateBottomScroll = false;
 		console.log("Game Over, dude!");     
 		
-		var newElement = addToBottomScroll(gameModule.displayCard.getElementsByClassName('displayCard__title')[0].innerText);
-		lockBottomScroll(newElement, true);
+		var newElement = addToRightSide(gameModule.displayCard.getElementsByClassName('displayCard__title')[0].innerText);
 		var currentSelected = newElement.getElementsByClassName("stationOrder__station--label")[0].innerText;
 
 		stationArray.sort(function(a, b) {return a.ridership - b.ridership});
@@ -586,7 +462,6 @@ var gameModule = (function () {
     function displayWinScreen () {
         // This function is called by checkSwipeVsSelected when dataSet runs out of stations.
         gameModule.animateDisplayCircle = false;
-        gameModule.animateBottomScroll = false;
         console.log("Winner, winner, chicken dinner!");      
     
         gameModule.displayCard.innerHTML = "";
@@ -675,12 +550,12 @@ var gameModule = (function () {
 			    	var completePercentage = .85;
 			    	var percentageOfMove = gameModule.displayStationCircle.translateX/maxMove;
 
-					// did you swipe long enough to check the card, and is the swipe direction locked?
-			    	/* if (percentageOfMove > completePercentage) {
-			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, 1 );
+					// did you swipe long enough to add the card to the right?
+			    	if (percentageOfMove > completePercentage) {
+			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText);
 			    	} else if (percentageOfMove < -completePercentage) {
-			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText, -1 );
-			    	} */
+			    		checkSwipeVsSelected( gameModule.displayCard.getElementsByClassName("displayCard__title")[0].innerText);
+			    	} 
 
 			    	// turn on animations to put the circle back
 			    	gameModule.animateDisplayCircle = true;
@@ -691,7 +566,6 @@ var gameModule = (function () {
 		init: function () {
             // Reset game state variables
             gameModule.animateDisplayCircle = false;
-            gameModule.animateBottomScroll = false;
             gameModule.selectedStation = null;
             
             // Initialize game object properties to doc elements
@@ -702,12 +576,12 @@ var gameModule = (function () {
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear existing stations to start fresh
-            // gameModule.stationOrd.innerHTML = '';
+            gameModule.stationOrd.innerHTML = '';
             gameModule.stationOrd.style.top = "35%";
             
             setupDataObject();
             
-            // displayStartScreen();
+            displayStartScreen();
             
             if (start) {
                 start = false;
@@ -720,7 +594,6 @@ var gameModule = (function () {
 		},
 		// ———— ———— animation flags:
 		animateDisplayCircle: false,
-		animateBottomScroll: false,
 		animate: function () {
 			/* 
 			*	recursive call to the animation funciton. 
@@ -757,35 +630,6 @@ var gameModule = (function () {
 		    		gameModule.displayStationCircle.scaleY = 1;
 
 		    	}
-		    }
-		    if (gameModule.animateBottomScroll) {
-                // Animate selected station to center of screen
-                var stationToLock = gameModule.getStationWithSpace();
-                if (stationToLock != null && stationToLock != undefined) {
-                    var screenMiddle = window.screen.width *.5;
-                    var current = parseInt(gameModule.stationOrd.style.left);
-                    var final = screenMiddle - (stationToLock.offsetLeft + (stationToLock.offsetWidth * .5));
-					var step = Math.max(Math.abs(final - current) * .15, 3);
-                    var allowance = step + 1;
-
-                    if(current > final && (current > (final + allowance))) {
-                        // move left - 
-                        gameModule.stationOrd.style.left = (current - step) + "px";   
-                    }
-                    else if(current < final && (current < (final - allowance))) {
-                        // move right +
-                        gameModule.stationOrd.style.left = (current + step) + "px";
-                    }
-                    else {
-                        // End animation
-                        gameModule.stationOrd.style.left = final + "px";
-						gameModule.animateBottomScroll = false;
-						afBottom.on('touchStart', onTouchStartBottomScrollContainer);
-						afBottom.on('pressMove', onPressMoveBottomScrollContainer);
-						afBottom.on('touchEnd', onTouchEndBottomScrollContainer);
-						afBottom.on('tap', onTapBottomScrollContainer);
-                    }                             
-                }
 		    }
 			if (gameModule.animateDisplayCircle) { 
 				// recursion. window.request... is a more performant animation function than setInterval

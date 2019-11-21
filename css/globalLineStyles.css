@@ -5,11 +5,11 @@ Error: Undefined variable: "$fourfivesix".
 1: 
 2: .fourfivesix
 3: 	background: $fourfivesix
-4: .nqrw
-5: 	background: $nqrw
-6: 	color: black
-7: .l
-8: 	background: $l
+4: 	color: white
+5: .nqrw
+6: 	background: $nqrw
+7: 	color: $mtaGrey
+8: .l
 
 Backtrace:
 sass/globalLineStyles.sass:3
@@ -65,4 +65,4 @@ sass/globalLineStyles.sass:3
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: Undefined variable: \"$fourfivesix\".\A         on line 3 of sass/globalLineStyles.sass\A \A 1: \A 2: .fourfivesix\A 3: 	background: $fourfivesix\A 4: .nqrw\A 5: 	background: $nqrw\A 6: 	color: black\A 7: .l\A 8: 	background: $l"; }
+  content: "Error: Undefined variable: \"$fourfivesix\".\A         on line 3 of sass/globalLineStyles.sass\A \A 1: \A 2: .fourfivesix\A 3: 	background: $fourfivesix\A 4: 	color: white\A 5: .nqrw\A 6: 	background: $nqrw\A 7: 	color: $mtaGrey\A 8: .l"; }

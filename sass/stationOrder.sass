@@ -28,7 +28,6 @@ $stationTransitionTime: .2s
             width: $stationWidth
             height: $stationWidth
             display: block
-            background: white
             margin: $stationWidth 0
             @at-root #{&}--label
                 padding-left: $stationWidth*2-1
@@ -40,6 +39,7 @@ $stationTransitionTime: .2s
                 position: absolute
                 text-align: left
                 color: $mtaGrey
+                margin-top: -2px
             &.lockedMore
                 margin-right: -.5vw
                 border-right: solid gold 1vw

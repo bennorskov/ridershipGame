@@ -1,5 +1,5 @@
 /*
-Error: Undefined variable: "$nqrw".
+Error: Undefined variable: "$startingTopOffset".
         on line 14 of sass/displayCard.sass
 
 9:     .displayStationCircle
@@ -7,12 +7,12 @@ Error: Undefined variable: "$nqrw".
 11:         height: $displayStationWidth
 12:         border-radius: $displayStationWidth
 13:         position: absolute
-14:         background: $nqrw
-15:         top: $startingTopOffset
-16:         left: $displayStationWidth * .5
-17:         margin-top: $displayStationWidth*-.4
-18:         color: $mtaGrey
-19:         line-height: $displayStationWidth
+14:         top: $startingTopOffset
+15:         left: $displayStationWidth * .5
+16:         margin-top: $displayStationWidth*-.4
+17:         line-height: $displayStationWidth
+18:         font-size: 3em
+19:         text-align: center
 
 Backtrace:
 sass/displayCard.sass:14
@@ -79,4 +79,4 @@ sass/displayCard.sass:14
 body:before {
   white-space: pre;
   font-family: monospace;
-  content: "Error: Undefined variable: \"$nqrw\".\A         on line 14 of sass/displayCard.sass\A \A 9:     .displayStationCircle\A 10:         width: $displayStationWidth\A 11:         height: $displayStationWidth\A 12:         border-radius: $displayStationWidth\A 13:         position: absolute\A 14:         background: $nqrw\A 15:         top: $startingTopOffset\A 16:         left: $displayStationWidth * .5\A 17:         margin-top: $displayStationWidth*-.4\A 18:         color: $mtaGrey\A 19:         line-height: $displayStationWidth"; }
+  content: "Error: Undefined variable: \"$startingTopOffset\".\A         on line 14 of sass/displayCard.sass\A \A 9:     .displayStationCircle\A 10:         width: $displayStationWidth\A 11:         height: $displayStationWidth\A 12:         border-radius: $displayStationWidth\A 13:         position: absolute\A 14:         top: $startingTopOffset\A 15:         left: $displayStationWidth * .5\A 16:         margin-top: $displayStationWidth*-.4\A 17:         line-height: $displayStationWidth\A 18:         font-size: 3em\A 19:         text-align: center"; }

@@ -653,6 +653,7 @@ var gameModule = (function () {
 			});
 		},
 		init: function () {
+			console.log("init");
             // Reset game state variables
             gameModule.animateDisplayCard = false;
             gameModule.animateBottomScroll = false;
@@ -749,4 +750,4 @@ var gameModule = (function () {
 			}
 		}
 	}
-})();
+})()

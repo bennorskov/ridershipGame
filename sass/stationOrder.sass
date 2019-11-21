@@ -1,78 +1,77 @@
-$stationWidth: 13vw
+$stationWidth: 3vw
 $stationMargin: $stationWidth/2 + 1
-.bottomScrollContainer
-    position: static
-    width: 100vw
-    height: 50vh
+.rightStationHolder
+    position: absolute
+    width: 40vw
+    height: 100vh
     overflow: hidden
-.stationOrder
-    text-align: center
-    position: fixed
-    bottom: 15vh
-    height: $stationWidth
-    overflow: visible
-    white-space: nowrap
-    text-overflow: nowrap
-    left: 0px
-    @at-root #{&}__station
-        transition: all .2sec
-        border-radius: $stationMargin
-        border: solid black 1vw
-        width: $stationWidth
-        height: $stationWidth
-        display: inline-block
-        position: relative
-        margin-top: -$stationMargin + 1
-        margin-left: $stationMargin - 2
-        margin-right: $stationMargin - 2
-        margin-bottom: 0
-        @at-root #{&}--label
-            left: -2vw
-            top: -$stationWidth - 4 
-            font-size: .75em
-            overflow: hidden
-            white-space: nowrap
-            text-overflow: ellipsis
-            width: 15vh
-            transform: rotate(-65deg)
-            position: absolute
-            text-align: left
-            color: #b3b3b3
-        &.selectedStation
-            border-radius: $stationMargin + 4
-            width: $stationWidth + 6
-            height: $stationWidth + 6
-            margin-top: -$stationMargin - 12
-            margin-left: $stationMargin
-            margin-right: $stationMargin
-            margin-bottom: -1.5vw
-            border: none
-            .stationOrder__station--label
-                display: none
-            .stationOrder__station--lineLabel
-                font-size: 3em
-                top: $stationWidth * .25
-        &.lockedMore
-            margin-right: -.5vw
-            border-right: solid gold 1vw
-        &.lockedLess
-            margin-left: -.5vw
-            border-left: solid gold 1vw
-        @at-root #{&}--lineLabel
-            width: inherit
-            height: inherit
-            vertical-align: middle
-            color: inherit
-            text-align: center
-            font-size: 2em
-            line-height: $stationWidth
-            position: absolute
-    @at-root #{&}__selectedStationLabel
-        font-size: 2em
-        position: fixed
-        bottom: 5vh
-        margin: auto
+    right: 0
+    top: 0
+    @at-root #{&}__bgBar
+        height: 100%
+        width: 3%
+        background: $mtaGrey
+        margin: 0 21%
+        border-left: 1px #555 solid
+        border-right: 1px #666 solid
+    .stationOrder
         width: 100%
-        text-align: center
-        color: white
+        top: 0
+        position: absolute
+        padding-left: 16%
+        @at-root #{&}__station
+            transition: all .2s
+            border-radius: $stationMargin
+            border: solid black 1vw
+            width: $stationWidth
+            height: $stationWidth
+            display: block
+            background: white
+            margin: $stationWidth 0
+            @at-root #{&}--label
+                padding-left: $stationWidth*2-1
+                font-size: .75em
+                overflow: hidden
+                white-space: nowrap
+                text-overflow: ellipsis
+                width: 15vh
+                position: absolute
+                text-align: left
+                color: $mtaGrey
+            &.lockedMore
+                margin-right: -.5vw
+                border-right: solid gold 1vw
+            &.lockedLess
+                margin-left: -.5vw
+                border-left: solid gold 1vw
+            @at-root #{&}--lineLabel
+                width: inherit
+                height: inherit
+                vertical-align: middle
+                color: inherit
+                text-align: center
+                font-size: 2em
+                line-height: $stationWidth
+                position: absolute
+        .extraSpace
+            margin-top: $stationWidth * 4
+        @at-root #{&}__stationSelected
+            border-radius: $stationMargin*2
+            border: dashed $mtaGrey 1vw
+            width: $stationWidth*2
+            height: $stationWidth*2
+            display: block
+            background: white
+            opacity: .8
+            position: absolute
+            top: 50%
+            margin-left: 5vw
+        @at-root #{&}__selectedStationLabel
+            font-size: 2em
+            position: fixed
+            bottom: 5vh
+            margin: auto
+            width: 100%
+            text-align: center
+            color: white
 

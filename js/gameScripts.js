@@ -249,49 +249,46 @@ var gameModule = (function () {
 		*/
 	  
 		// Check for game start/win/lose events
-			if(swipedStation == "Game Over" || swipedStation == "You Win") {
-	            gameModule.init()
-				return;
-			} else if (swipedStation == "Subway Riders") {
-	            changeDisplayCard(getRandomStationName());
-	            return;
-	        } else if(gameModule.getStationWithSpace() == null && displayedStations.size == 0) {
-				addToRightSide(swipedStation);
-				changeDisplayCard( getRandomStationName() );
-	            return;    
-	        }
+		if(swipedStation == "Game Over" || swipedStation == "You Win") {
+            gameModule.init()
+			return;
+		} else if (swipedStation == "Subway Riders") {
+			// start card
+            changeDisplayCard(getRandomStationName());
+            return;
+        } else if(gameModule.getStationWithSpace() == null && displayedStations.size == 0) {
+        	// if there is no stations, it's the first one. add it and grab another
+			addToRightSide(swipedStation);
+			changeDisplayCard( getRandomStationName() );
+            return;    
+        }
 
-		// store stations in "currentStationData" then compare
-
-/* 
-
-			THIS PART RIGHT HERE NEEDS WORK
-
-
-
-
-*/
-
+        // comparison for station ridership
 		var currentStationData = dataSet.get(swipedStation);
 		var bottomStationRidership, topStationRidership;
-		bottomStationRidership = gameModule.getStationWithSpace();
+		// return the DOM element with space on top for the station you're adding
+		bottomStationRidership = gameModule.getStationWithSpace(); 
 		if (bottomStationRidership == undefined) {
-			bottomStationRidership = 0; // dummy value for when the right side has only one station in it
-			topStationRidership = displayedStations.get("gameModule.stationOrd.lastElementChild.innerText").ridership;
+			// if there is no station with space, then we add to the end of the list
+			bottomStationRidership = 0; // dummy data for compare later
+			topStationRidership = displayedStations.get(gameModule.stationOrd.lastElementChild.innerText).ridership;
 			// above line is last station currently displayed. 
 		} else {
+			// see how much the ridership is below:
 			bottomStationRidership = displayedStations.get(bottomStationRidership.getElementsByClassName("stationOrder__station--label")[0].innerText).ridership;
+			// grab the station above:
 			topStationRidership = gameModule.getStationWithSpace().previousElementSibling;
 			if (topStationRidership != null) {
+				// if there is one, then grab its ridership
 				topStationRidership = displayedStations.get(topStationRidership.getElementsByClassName("stationOrder__station--label")[0].innerText).ridership;
 			} else {
 				topStationRidership = 999999999; // make a "dummy" top station that everything is less than
 			}
 		}
 		
-        console.log("Numbers: " + currentStationData.ridership + ": " + currentStationData.name + "\n" + bottomStationRidership + " < bottom | top => " + topStationRidership);
+        // console.log("swiped: " + currentStationData.ridership + ": " + currentStationData.name + "\n" + bottomStationRidership + " < bottom | top => " + topStationRidership);
         
-		//	Need to check against spaceStation and topSTation
+		//	Need to check against spaceStation and topStation
 		if (currentStationData.ridership > bottomStationRidership && currentStationData.ridership < topStationRidership) {
 			addToRightSide(swipedStation);
 		} else {  
@@ -584,7 +581,7 @@ var gameModule = (function () {
             gameModule.stationOrd = document.getElementsByClassName("stationOrder")[0];
 
             // Clear existing stations to start fresh
-            gameModule.stationOrd.innerHTML = '';
+            //gameModule.stationOrd.innerHTML = '';
             gameModule.stationOrd.style.top = "35%";
             
             setupDataObject();

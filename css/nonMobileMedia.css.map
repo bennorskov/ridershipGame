@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,oCAAoC;EAClC,eAAe;IACb,KAAK,EAAE,IAAI;IACX,MAAM,EAAE,MAAM",
+"sources": ["../sass/nonMobileMedia.sass"],
+"names": [],
+"file": "nonMobileMedia.css"
+}

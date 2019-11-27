@@ -27,8 +27,9 @@ $stationTransitionTime: .2s
             border: solid black 1vw
             width: $stationWidth
             height: $stationWidth
-            display: block
-            margin: $stationWidth 0
+            float: left
+            clear: left
+            margin: $stationWidth auto
             @at-root #{&}--label
                 padding-left: $stationWidth*2-1
                 font-size: .75em
@@ -55,17 +56,11 @@ $stationTransitionTime: .2s
                 font-size: 2em
                 line-height: $stationWidth
                 position: absolute
-        .extraSpace
-            margin-top: $stationWidth * 4
-        @at-root #{&}__stationSelected
-            border-radius: $stationMargin*2
-            border: dashed $mtaGrey 1vw
-            width: $stationWidth*2
-            height: $stationWidth*2
-            display: block
-            background: white
-            opacity: .8
-            position: absolute
-            top: $startingTopOffset
-            margin-left: 5vw
+            &.blankStation
+                border-radius: $stationMargin*2
+                border: dashed $mtaGrey 1vw
+                width: $stationWidth*2
+                height: $stationWidth*2
+                background: white
+                opacity: .8
 

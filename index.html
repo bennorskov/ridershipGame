@@ -10,45 +10,46 @@
 	<title>Ridership Game</title>
 </head>
 <body onload="gameModule.init()">
-	<div class="displayCardTouchContainer">
-		<section class="displayStationCircle">
-			Q
-		</section>
-		<section class="displayCard">
-			<hr>
-			<h1 class="displayCard__title">
-				14th St-Union Square
-			</h1>
-			<div class="displayCard__lines">
-				<div class="displayCard__lines--circle fourfivesix">4</div>
-				<div class="displayCard__lines--circle fourfivesix">5</div>
-				<div class="displayCard__lines--circle fourfivesix">6</div>
-				<div class="displayCard__lines--circle nqrw">N</div>
-				<div class="displayCard__lines--circle nqrw">Q</div>
-				<div class="displayCard__lines--circle nqrw">R</div>
-				<div class="displayCard__lines--circle l">L</div>
-			</div>
-		</section>
-	</div>
-	<div class='rightStationHolder'>
-		<div class="rightStationHolder__bgBar"></div>
-		<div class="stationOrder">
-			<div class="stationOrder__station">
-				<h1 class="stationOrder__station--label">34 St-Penn Station</h1>
-			</div>
-			<div class="stationOrder__station">
-				<h1 class="stationOrder__station--label">Fulton St</h1>
-			</div>
-			<div class="stationOrder__station extraSpace">
-				<h1 class="stationOrder__station--label">Lexington Av / 59 St</h1>
-			</div>
-			<div class="stationOrder__station">
-				<h1 class="stationOrder__station--label">Lexington Av-53 St</h1>
+	<div id="outerContainer">
+		<div class="displayCardTouchContainer">
+			<section class="displayStationCircle">
+				Q
+			</section>
+			<section class="displayCard">
+				<hr>
+				<h1 class="displayCard__title">
+					14th St-Union Square
+				</h1>
+				<div class="displayCard__lines">
+					<div class="displayCard__lines--circle fourfivesix">4</div>
+					<div class="displayCard__lines--circle fourfivesix">5</div>
+					<div class="displayCard__lines--circle fourfivesix">6</div>
+					<div class="displayCard__lines--circle nqrw">N</div>
+					<div class="displayCard__lines--circle nqrw">Q</div>
+					<div class="displayCard__lines--circle nqrw">R</div>
+					<div class="displayCard__lines--circle l">L</div>
+				</div>
+			</section>
+		</div>
+		<div class='rightStationHolder'>
+			<div class="rightStationHolder__bgBar"></div>
+			<div class="stationOrder">
+				<div class="stationOrder__station">
+					<h1 class="stationOrder__station--label">34 St-Penn Station</h1>
+				</div>
+				<div class="stationOrder__station blankStation"></div>
+				<div class="stationOrder__station">
+					<h1 class="stationOrder__station--label">Fulton St</h1>
+				</div>
+				<div class="stationOrder__station">
+					<h1 class="stationOrder__station--label">Lexington Av / 59 St</h1>
+				</div>
+				<div class="stationOrder__station">
+					<h1 class="stationOrder__station--label">Lexington Av-53 St</h1>
+				</div>
 			</div>
 		</div>
-
-		<div class="stationOrder__stationSelected"></div>
+		<div class="waterBg"></div>
 	</div>
-	<div class="waterBg"></div>
 </body>
 </html>
